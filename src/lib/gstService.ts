@@ -124,15 +124,18 @@ export const uploadDocument = async (
   const fileExt = file.name.split('.').pop();
   const fileName = `${applicationId}/${documentType}-${Date.now()}.${fileExt}`;
 
-  const { error: uploadError } = await supabase.storage
+  const { data: uploadData, error: uploadError } = await supabase.storage
     .from('gst-documents')
-    .upload(fileName, file);
+    .upload(fileName, file, {
+      upsert: true,
+    });
 
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    console.error('Upload error:', uploadError);
+    throw new Error(`Failed to upload document: ${uploadError.message}`);
+  }
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('gst-documents')
-    .getPublicUrl(fileName);
+  const filePath = uploadData?.path || fileName;
 
   const { error: dbError } = await supabase
     .from('application_documents')
@@ -140,11 +143,14 @@ export const uploadDocument = async (
       application_id: applicationId,
       document_type: documentType,
       file_name: file.name,
-      file_url: publicUrl,
+      file_url: filePath,
       file_size: file.size,
     }]);
 
-  if (dbError) throw dbError;
+  if (dbError) {
+    console.error('Database error:', dbError);
+    throw new Error(`Failed to save document record: ${dbError.message}`);
+  }
 };
 
 export const getApplicationDocuments = async (applicationId: string) => {
@@ -155,10 +161,42 @@ export const getApplicationDocuments = async (applicationId: string) => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+
+  const documentsWithUrls = await Promise.all(
+    (data || []).map(async (doc) => {
+      const { data: signedUrlData } = await supabase.storage
+        .from('gst-documents')
+        .createSignedUrl(doc.file_url, 3600);
+
+      return {
+        ...doc,
+        file_url: signedUrlData?.signedUrl || doc.file_url,
+      };
+    })
+  );
+
+  return documentsWithUrls;
 };
 
 export const deleteDocument = async (documentId: string): Promise<void> => {
+  const { data: doc, error: fetchError } = await supabase
+    .from('application_documents')
+    .select('file_url')
+    .eq('id', documentId)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+
+  if (doc?.file_url) {
+    const { error: storageError } = await supabase.storage
+      .from('gst-documents')
+      .remove([doc.file_url]);
+
+    if (storageError) {
+      console.error('Storage deletion error:', storageError);
+    }
+  }
+
   const { error } = await supabase
     .from('application_documents')
     .delete()
