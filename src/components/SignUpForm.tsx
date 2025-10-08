@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { UserCircle2, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface SignUpFormProps {
   onNavigateToSignIn: () => void;
@@ -13,10 +14,47 @@ export default function SignUpForm({ onNavigateToSignIn }: SignUpFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Sign up:', { fullName, email, mobileNumber, password, confirmPassword });
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            mobile_number: mobileNumber,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        console.log('Sign up successful');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during sign up');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleSignUp = () => {
@@ -51,6 +89,12 @@ export default function SignUpForm({ onNavigateToSignIn }: SignUpFormProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           <button
             type="button"
             onClick={handleGoogleSignUp}
@@ -240,9 +284,10 @@ export default function SignUpForm({ onNavigateToSignIn }: SignUpFormProps) {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white font-medium py-3 rounded-lg hover:bg-green-600 transition-colors shadow-sm"
+            disabled={loading}
+            className="w-full bg-green-500 text-white font-medium py-3 rounded-lg hover:bg-green-600 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
 
           <p className="text-xs text-center text-gray-600 leading-relaxed">
