@@ -1,6 +1,8 @@
 import { LogOut, Home, FileText, User, DollarSign, HelpCircle, Calculator, FileCheck, Users, Building, ShoppingCart, Briefcase, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import ServicePricing from './ServicePricing';
+import FAQ from './FAQ';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -182,7 +184,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Available Services</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, index) => (
@@ -216,6 +218,10 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+
+        <ServicePricing />
+
+        <FAQ />
       </main>
     </div>
   );
