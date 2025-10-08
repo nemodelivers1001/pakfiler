@@ -6,9 +6,10 @@ import FAQ from './FAQ';
 
 interface DashboardProps {
   onNavigateToCalculator: () => void;
+  onNavigateToGSTRegistration: () => void;
 }
 
-export default function Dashboard({ onNavigateToCalculator }: DashboardProps) {
+export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration }: DashboardProps) {
   const { user } = useAuth();
 
   const handleSignOut = async () => {
@@ -195,8 +196,12 @@ export default function Dashboard({ onNavigateToCalculator }: DashboardProps) {
               <div
                 key={index}
                 onClick={() => {
-                  if (service.available && service.title === 'Salary Tax Calculator') {
-                    onNavigateToCalculator();
+                  if (service.available) {
+                    if (service.title === 'Salary Tax Calculator') {
+                      onNavigateToCalculator();
+                    } else if (service.title === 'GST Registration') {
+                      onNavigateToGSTRegistration();
+                    }
                   }
                 }}
                 className={`relative border-2 rounded-xl p-4 sm:p-6 transition-all hover:shadow-md ${

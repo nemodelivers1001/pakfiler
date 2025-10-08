@@ -4,12 +4,10 @@ import Header from './components/Header';
 import FeatureSection from './components/FeatureSection';
 import SignInForm from './components/SignInForm';
 import SignUpForm from './components/SignUpForm';
-import Dashboard from './components/Dashboard';
-import TaxCalculator from './components/TaxCalculator';
+import MainApp from './components/MainApp';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<'signin' | 'signup'>('signin');
-  const [currentView, setCurrentView] = useState<'dashboard' | 'calculator'>('dashboard');
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -21,10 +19,7 @@ function AppContent() {
   }
 
   if (user) {
-    if (currentView === 'calculator') {
-      return <TaxCalculator onBack={() => setCurrentView('dashboard')} />;
-    }
-    return <Dashboard onNavigateToCalculator={() => setCurrentView('calculator')} />;
+    return <MainApp />;
   }
 
   return (
