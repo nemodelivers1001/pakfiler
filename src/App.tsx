@@ -1,11 +1,26 @@
 import { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import FeatureSection from './components/FeatureSection';
 import SignInForm from './components/SignInForm';
 import SignUpForm from './components/SignUpForm';
+import Dashboard from './components/Dashboard';
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState<'signin' | 'signup'>('signin');
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Dashboard />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
@@ -35,6 +50,14 @@ function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
