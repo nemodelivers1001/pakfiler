@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, ArrowLeft, Upload, Eye, Trash2, CheckSquare, FileText, Check, X, Download, Image as ImageIcon } from 'lucide-react';
 import { DOCUMENT_TYPES } from '../types/gst';
+import { uploadDocument, getApplicationDocuments, deleteDocument } from '../lib/gstService';
 
 interface GSTRegistrationStep2Props {
   applicationId: string;
@@ -13,32 +14,82 @@ interface DocumentStatus {
     uploaded: boolean;
     file?: File;
     preview?: string;
+    id?: string;
   };
 }
 
-export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistrationStep2Props) {
+export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: GSTRegistrationStep2Props) {
   const [documents, setDocuments] = useState<DocumentStatus>({});
   const [dontHaveFlags, setDontHaveFlags] = useState<{ [key: string]: boolean }>({});
   const [previewDocument, setPreviewDocument] = useState<{ type: string; preview: string; fileName: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
 
-  const handleFileSelect = (documentType: string, file: File | null) => {
-    if (!file) return;
+  useEffect(() => {
+    loadExistingDocuments();
+  }, [applicationId]);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setDocuments(prev => ({
-        ...prev,
-        [documentType]: {
+  const loadExistingDocuments = async () => {
+    if (!applicationId) return;
+
+    try {
+      const existingDocs = await getApplicationDocuments(applicationId);
+      const docStatus: DocumentStatus = {};
+
+      existingDocs.forEach(doc => {
+        docStatus[doc.document_type] = {
           uploaded: true,
-          file,
-          preview: reader.result as string,
-        },
-      }));
-    };
-    reader.readAsDataURL(file);
+          preview: doc.file_url,
+          id: doc.id,
+        };
+      });
+
+      setDocuments(docStatus);
+    } catch (error) {
+      console.error('Error loading documents:', error);
+    }
   };
 
-  const handleDelete = (documentType: string) => {
+  const handleFileSelect = async (documentType: string, file: File | null) => {
+    if (!file || !applicationId) return;
+
+    setUploadingDoc(documentType);
+
+    try {
+      await uploadDocument(applicationId, documentType, file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setDocuments(prev => ({
+          ...prev,
+          [documentType]: {
+            uploaded: true,
+            file,
+            preview: reader.result as string,
+          },
+        }));
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      alert(`Failed to upload ${documentType}. Please try again.`);
+    } finally {
+      setUploadingDoc(null);
+    }
+  };
+
+  const handleDelete = async (documentType: string) => {
+    const doc = documents[documentType];
+    if (doc?.id) {
+      try {
+        await deleteDocument(doc.id);
+      } catch (error) {
+        console.error('Error deleting document:', error);
+        alert('Failed to delete document. Please try again.');
+        return;
+      }
+    }
+
     setDocuments(prev => {
       const newDocs = { ...prev };
       delete newDocs[documentType];
@@ -160,9 +211,13 @@ export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistration
                             className="hidden"
                             accept="image/*,.pdf"
                             onChange={(e) => handleFileSelect(docType, e.target.files?.[0] || null)}
-                            disabled={dontHaveFlags[docType]}
+                            disabled={dontHaveFlags[docType] || uploadingDoc === docType}
                           />
-                          <Upload className={`w-5 h-5 ${dontHaveFlags[docType] ? 'text-gray-300' : 'text-green-600 hover:text-green-700'}`} />
+                          {uploadingDoc === docType ? (
+                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Upload className={`w-5 h-5 ${dontHaveFlags[docType] ? 'text-gray-300' : 'text-green-600 hover:text-green-700'}`} />
+                          )}
                         </label>
                       </div>
                       <div className="px-4 py-4">
@@ -234,16 +289,18 @@ export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistration
             <div className="flex justify-between pt-6 border-t border-gray-200">
               <button
                 onClick={onBack}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg flex items-center gap-2 hover:bg-gray-50 transition-all hover:border-gray-400"
+                disabled={loading}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg flex items-center gap-2 hover:bg-gray-50 transition-all hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Previous Step
               </button>
               <button
                 onClick={onNext}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
+                disabled={loading || !!uploadingDoc}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue to Payment
+                {loading ? 'Saving...' : 'Continue to Payment'}
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>

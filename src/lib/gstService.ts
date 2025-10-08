@@ -14,7 +14,8 @@ export const createGSTApplication = async (data: BusinessInformationData): Promi
     user_id: user.id,
     reference_number: refNumber,
     ...data,
-    submitted_at: new Date().toISOString(),
+    status: 'draft',
+    payment_status: 'pending',
   };
 
   const { data: application, error } = await supabase
@@ -29,8 +30,8 @@ export const createGSTApplication = async (data: BusinessInformationData): Promi
     .from('application_timeline')
     .insert([{
       application_id: application.id,
-      status: 'pending_payment',
-      notes: 'Application submitted',
+      status: 'draft',
+      notes: 'Application created',
     }]);
 
   return application;
