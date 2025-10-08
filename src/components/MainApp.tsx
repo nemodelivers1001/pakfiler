@@ -7,12 +7,13 @@ import TaxCalculator from './TaxCalculator';
 import GSTRegistrationFlow from './GSTRegistrationFlow';
 import TrackSubmissions from './TrackSubmissions';
 import ApplicationDetails from './ApplicationDetails';
+import Profile from './Profile';
 import { GSTApplication } from '../types/gst';
 
 type View = 'dashboard' | 'calculator' | 'gst-registration' | 'track-submissions' | 'application-details' | 'pricing' | 'profile';
 
 export default function MainApp() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedApplication, setSelectedApplication] = useState<GSTApplication | null>(null);
 
@@ -21,8 +22,7 @@ export default function MainApp() {
   };
 
   const getUserName = () => {
-    const metadata = user?.user_metadata;
-    return metadata?.full_name || 'User';
+    return profile?.full_name || user?.user_metadata?.full_name || 'User';
   };
 
   const handleViewDetails = (application: GSTApplication) => {
@@ -67,6 +67,8 @@ export default function MainApp() {
             onBack={() => setCurrentView('track-submissions')}
           />
         ) : null;
+      case 'profile':
+        return <Profile />;
       case 'dashboard':
       default:
         return (
@@ -81,7 +83,7 @@ export default function MainApp() {
     }
   };
 
-  if (currentView === 'calculator' || currentView === 'gst-registration' || currentView === 'track-submissions' || currentView === 'application-details') {
+  if (currentView === 'calculator' || currentView === 'gst-registration' || currentView === 'track-submissions' || currentView === 'application-details' || currentView === 'profile') {
     return renderContent();
   }
 
