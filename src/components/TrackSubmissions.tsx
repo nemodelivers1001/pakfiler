@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, RefreshCw, Eye, CreditCard } from 'lucide-react';
+import { Search, RefreshCw, Eye, CreditCard, ArrowLeft, FileCheck, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { GSTApplication } from '../types/gst';
 import { getUserApplications } from '../lib/gstService';
 
@@ -75,13 +75,25 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <button
+          onClick={() => window.history.back()}
+          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-all hover:gap-3 font-medium"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back to Dashboard
+        </button>
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <span className="text-green-600">📋</span> Track My Submissions
-              </h1>
-              <p className="text-gray-600 mt-2">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <FileCheck className="w-7 h-7 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Track My Submissions
+                </h1>
+              </div>
+              <p className="text-gray-600">
                 Monitor the status of your tax-related applications and returns
               </p>
             </div>
@@ -96,10 +108,12 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-gray-700 font-medium">🔍 Filters</span>
-            <button className="text-sm text-blue-600 hover:underline">More</button>
+            <div className="flex items-center gap-2">
+              <Search className="w-5 h-5 text-blue-600" />
+              <span className="text-gray-700 font-semibold">Filters & Search</span>
+            </div>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
@@ -137,11 +151,19 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
-              📄 Applications ({filteredApplications.length}) - Page 1 of 1
-            </h2>
+        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <FileCheck className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Applications ({filteredApplications.length})
+                </h2>
+                <p className="text-xs text-gray-500">Page 1 of 1</p>
+              </div>
+            </div>
           </div>
 
           {loading ? (
@@ -180,7 +202,7 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredApplications.map((app) => (
-                    <tr key={app.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={app.id} className="hover:bg-blue-50 transition-all">
                       <td className="px-6 py-4">
                         <div>
                           <p className="font-medium text-gray-900">GST Registration</p>

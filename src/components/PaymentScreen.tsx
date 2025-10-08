@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, CreditCard, Smartphone, FileText } from 'lucide-react';
+import { ArrowLeft, CreditCard, Smartphone, FileText, CheckCircle2, Wallet } from 'lucide-react';
 import { GSTApplication } from '../types/gst';
 
 interface PaymentScreenProps {
@@ -31,6 +31,8 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
       title: 'Manual Payment',
       description: 'Manual Payment using Bank Transfer / IBFT / RAAST',
       icon: FileText,
+      iconColor: 'text-slate-600',
+      bgColor: 'bg-slate-100',
       available: true,
     },
     {
@@ -38,6 +40,8 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
       title: 'Credit / Debit Card',
       description: 'Pay securely with Visa, MasterCard, or any debit card via AbhiPay',
       icon: CreditCard,
+      iconColor: 'text-blue-600',
+      bgColor: 'bg-blue-100',
       available: true,
     },
     {
@@ -45,6 +49,8 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
       title: 'EasyPaisa (Automatic)',
       description: 'Pay automatically using your EasyPaisa account',
       icon: Smartphone,
+      iconColor: 'text-green-600',
+      bgColor: 'bg-green-100',
       available: false,
       comingSoon: true,
     },
@@ -53,6 +59,8 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
       title: 'JazzCash (Automatic)',
       description: 'Pay automatically using your JazzCash account',
       icon: Smartphone,
+      iconColor: 'text-red-600',
+      bgColor: 'bg-red-100',
       available: false,
       comingSoon: true,
     },
@@ -63,38 +71,49 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
       <div className="max-w-4xl mx-auto px-4 py-8">
         <button
           onClick={onCancel}
-          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-colors"
+          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-all hover:gap-3 font-medium"
         >
-          <ArrowRight className="w-5 h-5 rotate-180" />
-          Back
+          <ArrowLeft className="w-5 h-5" />
+          Back to Track Submissions
         </button>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment</h1>
-            <p className="text-gray-600">Complete payment for your GST Registration application</p>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Wallet className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Complete Payment</h1>
+                <p className="text-sm text-gray-500">Step 3 of 3 - Final Step</p>
+              </div>
+            </div>
+            <p className="text-gray-600">Complete payment for your GST Registration application to proceed</p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 mb-8 shadow-sm">
             <div className="flex justify-between items-start mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Payment Summary</h2>
-              <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded">
-                PENDING PAYMENT
+              <h2 className="text-xl font-bold text-green-900 flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
+                Payment Summary
+              </h2>
+              <span className="px-4 py-1.5 bg-orange-500 text-white text-sm font-bold rounded-full shadow-md animate-pulse">
+                PAYMENT REQUIRED
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 text-sm">
-              <div>
-                <p className="text-gray-600 mb-1">Service Type</p>
-                <p className="font-semibold text-gray-900">GST Registration</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+              <div className="bg-white rounded-lg p-4 border border-green-200">
+                <p className="text-gray-600 text-sm mb-1">Service Type</p>
+                <p className="font-bold text-gray-900">GST Registration</p>
               </div>
-              <div>
-                <p className="text-gray-600 mb-1">Reference Number</p>
-                <p className="font-semibold text-gray-900">{application.reference_number}</p>
+              <div className="bg-white rounded-lg p-4 border border-green-200">
+                <p className="text-gray-600 text-sm mb-1">Reference Number</p>
+                <p className="font-bold text-gray-900">{application.reference_number}</p>
               </div>
-              <div>
-                <p className="text-gray-600 mb-1">Amount Due</p>
-                <p className="font-semibold text-gray-900 text-lg">Rs {application.service_fee.toLocaleString()}</p>
+              <div className="bg-white rounded-lg p-4 border-2 border-green-400">
+                <p className="text-gray-600 text-sm mb-1">Amount Due</p>
+                <p className="font-bold text-green-600 text-2xl">Rs {application.service_fee.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -121,19 +140,19 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                     }`}
                   >
                     <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-lg ${
+                      <div className={`p-3 rounded-lg transition-all ${
                         !method.available
                           ? 'bg-gray-200'
                           : isSelected
-                          ? 'bg-green-100'
-                          : 'bg-gray-100'
+                          ? 'bg-green-100 ring-2 ring-green-500'
+                          : method.bgColor
                       }`}>
-                        <Icon className={`w-6 h-6 ${
+                        <Icon className={`w-6 h-6 transition-all ${
                           !method.available
                             ? 'text-gray-400'
                             : isSelected
                             ? 'text-green-600'
-                            : 'text-gray-600'
+                            : method.iconColor
                         }`} />
                       </div>
                       <div className="flex-1">
@@ -156,8 +175,8 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                         </p>
                       </div>
                       {isSelected && method.available && (
-                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm">✓</span>
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-md">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
                         </div>
                       )}
                     </div>
@@ -172,17 +191,17 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                   <button
                     onClick={handlePayment}
                     disabled={isProcessing}
-                    className="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg flex items-center gap-2 transition-colors"
+                    className="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-400 text-white font-bold rounded-xl flex items-center gap-3 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl disabled:transform-none"
                   >
                     {isProcessing ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Processing...
+                        <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Processing Payment...
                       </>
                     ) : (
                       <>
-                        Proceed to Payment
-                        <ArrowRight className="w-5 h-5" />
+                        <CheckCircle2 className="w-6 h-6" />
+                        Complete Payment - Rs {application.service_fee.toLocaleString()}
                       </>
                     )}
                   </button>

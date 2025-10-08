@@ -1,5 +1,4 @@
-import { LogOut, Home, FileText, User, DollarSign, HelpCircle, Calculator, FileCheck, Users, Building, ShoppingCart, Briefcase, UserPlus } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { Calculator, FileCheck, Users, Building, ShoppingCart, Briefcase, UserPlus, FileText, DollarSign, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ServicePricing from './ServicePricing';
 import FAQ from './FAQ';
@@ -12,10 +11,6 @@ interface DashboardProps {
 export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration }: DashboardProps) {
   const { user } = useAuth();
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   const getUserName = () => {
     const metadata = user?.user_metadata;
     return metadata?.full_name || 'User';
@@ -23,8 +18,8 @@ export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegis
 
   const stats = [
     { label: 'Total Applications', value: '0', subtitle: 'No activity this month', icon: FileText, color: 'bg-blue-50 text-blue-600' },
-    { label: 'Pending Payment', value: '0', subtitle: 'No pending payments', icon: DollarSign, color: 'bg-yellow-50 text-yellow-600' },
-    { label: 'Under Process', value: '0', subtitle: 'No active applications', icon: FileCheck, color: 'bg-indigo-50 text-indigo-600' },
+    { label: 'Pending Payment', value: '0', subtitle: 'No pending payments', icon: DollarSign, color: 'bg-amber-50 text-amber-600' },
+    { label: 'Under Process', value: '0', subtitle: 'No active applications', icon: FileCheck, color: 'bg-cyan-50 text-cyan-600' },
     { label: 'Completed', value: '0', subtitle: 'No activity this month', icon: FileCheck, color: 'bg-green-50 text-green-600' },
   ];
 
@@ -94,54 +89,6 @@ export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegis
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">PF</span>
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="text-lg font-bold text-gray-900">PakFiler.com</h1>
-                <p className="text-xs text-gray-500">Fast, Affordable & Best Tax Filing</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 sm:space-x-6">
-              <button className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                <Home className="w-4 h-4" />
-                <span className="hidden lg:inline">Dashboard</span>
-              </button>
-              <button className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                <FileText className="w-4 h-4" />
-                <span className="hidden lg:inline">Track My Submission</span>
-              </button>
-              <button className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                <User className="w-4 h-4" />
-                <span className="hidden xl:inline">Profile</span>
-              </button>
-              <button className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                <DollarSign className="w-4 h-4" />
-                <span className="hidden xl:inline">Pricing</span>
-              </button>
-              <button className="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                <HelpCircle className="w-4 h-4" />
-                <span className="hidden xl:inline">Help & Support</span>
-              </button>
-              <div className="flex items-center space-x-3 pl-2 sm:pl-4 border-l border-gray-200">
-                <span className="text-sm text-gray-700 hidden md:inline">User | {getUserName()}</span>
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 relative overflow-hidden">
           <div className="flex flex-wrap items-center gap-2 mb-6 sm:mb-0 sm:absolute sm:top-4 sm:left-4">

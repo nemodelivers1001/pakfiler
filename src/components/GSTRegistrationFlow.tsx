@@ -59,11 +59,35 @@ export default function GSTRegistrationFlow({
     }
   };
 
-  const handleStep2Next = () => {
-    setCurrentStep('payment');
+  const handleStep2Next = async () => {
+    if (!application) return;
+
+    setIsLoading(true);
+    try {
+      await updateGSTApplication(application.id, {
+        submitted_at: new Date().toISOString(),
+      });
+      setCurrentStep('payment');
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      alert('Failed to submit application. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleStep2Back = () => {
+    if (application) {
+      setBusinessData({
+        business_name: application.business_name,
+        business_type: application.business_type,
+        business_nature: application.business_nature,
+        start_date: application.start_date,
+        description: application.description,
+        consumer_number: application.consumer_number,
+        business_address: application.business_address,
+      });
+    }
     setCurrentStep(1);
   };
 
@@ -89,7 +113,7 @@ export default function GSTRegistrationFlow({
   };
 
   const handlePaymentCancel = () => {
-    setCurrentStep(2);
+    onComplete();
   };
 
   if (isLoading) {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Building2, Calendar, Briefcase, FileText, MapPin, Zap } from 'lucide-react';
 import { BUSINESS_TYPES, BUSINESS_NATURES, BusinessInformationData } from '../types/gst';
 
 interface GSTRegistrationStep1Props {
@@ -60,33 +60,44 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
           Back
         </button>
 
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">GST Registration</h1>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Building2 className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">GST Registration</h1>
+                <p className="text-sm text-gray-500">Step 1 of 3</p>
+              </div>
+            </div>
             <p className="text-gray-600">Register your business for General Sales Tax with the Federal Board of Revenue</p>
           </div>
 
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
+          <div className="mb-8">
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white flex items-center justify-center font-bold shadow-md transform transition-transform hover:scale-105">
                   1
                 </div>
-                <span className="font-medium text-green-600">Business Information</span>
+                <div className="hidden sm:block">
+                  <span className="font-semibold text-green-600 block">Business Info</span>
+                  <span className="text-xs text-green-500">In Progress</span>
+                </div>
               </div>
-              <div className="w-16 h-0.5 bg-gray-300"></div>
+              <div className="flex-1 h-1 bg-gradient-to-r from-gray-300 to-gray-200 rounded-full max-w-[100px]"></div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
                   2
                 </div>
-                <span className="text-gray-500">Document Upload</span>
+                <span className="text-gray-400 text-sm hidden sm:inline">Documents</span>
               </div>
-              <div className="w-16 h-0.5 bg-gray-300"></div>
+              <div className="flex-1 h-1 bg-gray-200 rounded-full max-w-[100px]"></div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
                   3
                 </div>
-                <span className="text-gray-500">Submit Application</span>
+                <span className="text-gray-400 text-sm hidden sm:inline">Payment</span>
               </div>
             </div>
           </div>
@@ -100,7 +111,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-green-600" />
                     Business Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -119,7 +131,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-blue-600" />
                       Business Type <span className="text-red-500">*</span>
                     </label>
                     <select
@@ -142,7 +155,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-amber-600" />
                       Start Date <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -159,7 +173,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-cyan-600" />
                       Business Nature <span className="text-red-500">*</span>
                     </label>
                     <select
@@ -183,7 +198,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-slate-600" />
                     Description
                   </label>
                   <textarea
@@ -196,7 +212,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-yellow-600" />
                     Consumer Number (GAS/Electricity)
                   </label>
                   <input
@@ -209,7 +226,8 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-red-600" />
                     Business Address <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -231,9 +249,9 @@ export default function GSTRegistrationStep1({ initialData, onNext, onCancel }: 
             <div className="flex justify-end pt-6 border-t border-gray-200">
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg flex items-center gap-2 transition-colors"
+                className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
-                Continue
+                Continue to Documents
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>
