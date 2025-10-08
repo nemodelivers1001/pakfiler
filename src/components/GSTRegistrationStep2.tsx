@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, ArrowLeft, Upload, Eye, Trash2, CheckSquare, FileText, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Upload, Eye, Trash2, CheckSquare, FileText, Check, X, Download, Image as ImageIcon } from 'lucide-react';
 import { DOCUMENT_TYPES } from '../types/gst';
 
 interface GSTRegistrationStep2Props {
@@ -19,6 +19,7 @@ interface DocumentStatus {
 export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistrationStep2Props) {
   const [documents, setDocuments] = useState<DocumentStatus>({});
   const [dontHaveFlags, setDontHaveFlags] = useState<{ [key: string]: boolean }>({});
+  const [previewDocument, setPreviewDocument] = useState<{ type: string; preview: string; fileName: string } | null>(null);
 
   const handleFileSelect = (documentType: string, file: File | null) => {
     if (!file) return;
@@ -167,8 +168,12 @@ export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistration
                       <div className="px-4 py-4">
                         {documents[docType]?.preview ? (
                           <button
-                            onClick={() => window.open(documents[docType].preview, '_blank')}
-                            className="text-blue-600 hover:text-blue-700"
+                            onClick={() => setPreviewDocument({
+                              type: docType,
+                              preview: documents[docType].preview!,
+                              fileName: documents[docType].file?.name || 'document'
+                            })}
+                            className="text-blue-600 hover:text-blue-700 transition-colors"
                           >
                             <Eye className="w-5 h-5" />
                           </button>
@@ -245,6 +250,54 @@ export default function GSTRegistrationStep2({ onNext, onBack }: GSTRegistration
           </div>
         </div>
       </div>
+
+      {previewDocument && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg">{previewDocument.type}</h3>
+                  <p className="text-blue-100 text-sm">{previewDocument.fileName}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={previewDocument.preview}
+                  download={previewDocument.fileName}
+                  className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all"
+                >
+                  <Download className="w-5 h-5 text-white" />
+                </a>
+                <button
+                  onClick={() => setPreviewDocument(null)}
+                  className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all"
+                >
+                  <X className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </div>
+            <div className="p-6 overflow-auto max-h-[calc(90vh-80px)]">
+              {previewDocument.preview.startsWith('data:application/pdf') ? (
+                <iframe
+                  src={previewDocument.preview}
+                  className="w-full h-[70vh] border border-gray-200 rounded-lg"
+                  title="Document Preview"
+                />
+              ) : (
+                <img
+                  src={previewDocument.preview}
+                  alt={previewDocument.type}
+                  className="max-w-full h-auto rounded-lg shadow-lg mx-auto"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
