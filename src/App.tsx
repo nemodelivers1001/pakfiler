@@ -13,10 +13,22 @@ function AppContent() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes('type=recovery')) {
-      setCurrentPage('reset-password');
-    }
+    const checkForPasswordReset = () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=recovery')) {
+        setCurrentPage('reset-password');
+      } else if (hash && hash.includes('error=access_denied')) {
+        setCurrentPage('signin');
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    };
+
+    checkForPasswordReset();
+    window.addEventListener('hashchange', checkForPasswordReset);
+
+    return () => {
+      window.removeEventListener('hashchange', checkForPasswordReset);
+    };
   }, []);
 
   if (loading) {
