@@ -8,6 +8,29 @@ export const createGSTApplication = async (data: BusinessInformationData): Promi
     throw new Error('User not authenticated');
   }
 
+  const { data: profile, error: profileError } = await supabase
+    .from('user_profiles')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new Error('Failed to verify user profile: ' + profileError.message);
+  }
+
+  if (!profile) {
+    const { error: createProfileError } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: user.id,
+        account_status: 'active',
+      });
+
+    if (createProfileError) {
+      throw new Error('Failed to create user profile: ' + createProfileError.message);
+    }
+  }
+
   const { data: refNumber } = await supabase.rpc('generate_reference_number');
 
   const applicationData = {

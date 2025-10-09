@@ -8,6 +8,29 @@ import {
 } from '../types/iris';
 
 export async function createIRISSubmission(formData: IRISFormData, userId: string) {
+  const { data: profile, error: profileError } = await supabase
+    .from('user_profiles')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new Error('Failed to verify user profile: ' + profileError.message);
+  }
+
+  if (!profile) {
+    const { error: createProfileError } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: userId,
+        account_status: 'active',
+      });
+
+    if (createProfileError) {
+      throw new Error('Failed to create user profile: ' + createProfileError.message);
+    }
+  }
+
   const referenceNumber = `IRIS-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
 
   const submissionData: Partial<IRISSubmission> = {
