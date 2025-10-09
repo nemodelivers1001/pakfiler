@@ -77,97 +77,120 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button
           onClick={onBack}
-          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-colors"
+          className="mb-6 group text-gray-600 hover:text-green-600 flex items-center gap-2 transition-all font-medium"
         >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Applications
+          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+          <span className="group-hover:underline">Back to Applications</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">GST Registration</h1>
-                  <p className="text-sm text-gray-600">Application Details</p>
-                </div>
-                <span className={`px-3 py-1 text-sm font-semibold rounded ${getStatusColor(application.status)}`}>
-                  {getStatusLabel(application.status).toUpperCase()}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-gray-400" />
+            <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-transform duration-300 border border-green-100">
+              <div className="flex items-start justify-between mb-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-6 transition-transform">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
                   <div>
-                    <p className="text-xs text-gray-600">Reference Number</p>
-                    <p className="font-semibold text-gray-900">{application.reference_number}</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">GST Registration</h1>
+                    <p className="text-sm text-gray-600">Application Details</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-gray-400" />
+                <div className="animate-pulse-slow">
+                  <span className={`px-4 py-2 text-sm font-bold rounded-full shadow-md ${getStatusColor(application.status)}`}>
+                    {getStatusLabel(application.status).toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 pb-8 border-b-2 border-gray-100">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-md">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-xs text-gray-600">Submitted</p>
-                    <p className="font-semibold text-gray-900">
+                    <p className="text-xs text-gray-600 mb-1">Reference Number</p>
+                    <p className="font-bold text-gray-900">{application.reference_number}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center shadow-md">
+                    <Calendar className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Submitted</p>
+                    <p className="font-bold text-gray-900">
                       {application.submitted_at ? formatDate(application.submitted_at) : 'Not submitted'}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-gray-400" />
+                <div className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-md">
+                    <Clock className="w-6 h-6 text-white" />
+                  </div>
                   <div>
-                    <p className="text-xs text-gray-600">Last Updated</p>
-                    <p className="font-semibold text-gray-900">{formatDate(application.updated_at)}</p>
+                    <p className="text-xs text-gray-600 mb-1">Last Updated</p>
+                    <p className="font-bold text-gray-900">{formatDate(application.updated_at)}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">User Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-gray-400" />
+              <div className="mb-8 pb-8 border-b-2 border-gray-100">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Personal Information</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <User className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Full Name</p>
-                      <p className="font-medium text-gray-900">{user?.user_metadata?.full_name || 'N/A'}</p>
+                      <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || 'N/A'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <Mail className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Email</p>
-                      <p className="font-medium text-gray-900">{user?.email || 'N/A'}</p>
+                      <p className="font-semibold text-gray-900 truncate">{user?.email || 'N/A'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <Phone className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Mobile</p>
-                      <p className="font-medium text-gray-900">{user?.user_metadata?.phone || 'N/A'}</p>
+                      <p className="font-semibold text-gray-900">{user?.user_metadata?.phone || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mb-6 pb-6 border-b border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4">Payment Information</h3>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="grid grid-cols-3 gap-4">
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Payment Information</h3>
+                </div>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Service Details</p>
-                      <p className="font-semibold text-gray-900">GST Registration</p>
+                      <p className="text-xs text-gray-600 mb-2">Service Details</p>
+                      <p className="font-bold text-gray-900 text-lg">GST Registration</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Service Fees</p>
-                      <p className="font-semibold text-gray-900">PKR {application.service_fee.toLocaleString()}</p>
+                      <p className="text-xs text-gray-600 mb-2">Service Fees</p>
+                      <p className="font-bold text-green-700 text-2xl">PKR {application.service_fee.toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Payment Status</p>
-                      <p className={`font-semibold uppercase ${
+                      <p className="text-xs text-gray-600 mb-2">Payment Status</p>
+                      <p className={`font-bold uppercase text-lg ${
                         application.payment_status === 'completed' ? 'text-green-600' : 'text-orange-600'
                       }`}>
                         {application.payment_status}
@@ -178,15 +201,19 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
               </div>
 
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 uppercase mb-4 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-gray-600" />
-                  Submitted Documents
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">Submitted Documents</h3>
+                  </div>
                   {documents.length > 0 && (
-                    <span className="ml-auto px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 text-sm font-bold rounded-full border-2 border-green-200">
                       {documents.length} {documents.length === 1 ? 'Document' : 'Documents'}
                     </span>
                   )}
-                </h3>
+                </div>
                 {loadingDocs ? (
                   <div className="bg-gray-50 rounded-lg p-6 text-center">
                     <div className="inline-block w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -251,25 +278,27 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Business Information</h2>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Business Name:</p>
-                    <p className="font-medium text-gray-900">{application.business_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Business Type:</p>
-                    <p className="font-medium text-gray-900">{application.business_type}</p>
-                  </div>
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 transform hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <FileText className="w-6 h-6 text-white" />
                 </div>
+                <h2 className="text-2xl font-bold text-gray-900">Business Information</h2>
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Start Date:</p>
-                    <p className="font-medium text-gray-900">
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Business Name</p>
+                    <p className="font-bold text-gray-900 text-lg">{application.business_name}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Business Type</p>
+                    <p className="font-bold text-gray-900 text-lg">{application.business_type}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Start Date</p>
+                    <p className="font-bold text-gray-900">
                       {new Date(application.start_date).toLocaleDateString('en-US', {
                         month: 'long',
                         day: 'numeric',
@@ -277,45 +306,55 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
                       })}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Business Nature:</p>
-                    <p className="font-medium text-gray-900">{application.business_nature}</p>
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Business Nature</p>
+                    <p className="font-bold text-gray-900">{application.business_nature}</p>
                   </div>
                 </div>
 
                 {application.consumer_number && (
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Consumer Number:</p>
-                    <p className="font-medium text-gray-900">{application.consumer_number}</p>
+                  <div className="bg-gray-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Consumer Number</p>
+                    <p className="font-bold text-gray-900 text-lg font-mono">{application.consumer_number}</p>
                   </div>
                 )}
 
-                <div>
-                  <p className="text-xs text-gray-600 mb-1">Business Address:</p>
-                  <p className="font-medium text-gray-900">{application.business_address}</p>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border-2 border-green-200">
+                  <p className="text-xs text-gray-600 mb-2">Business Address</p>
+                  <p className="font-bold text-gray-900">{application.business_address}</p>
                 </div>
 
                 {application.description && (
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Description:</p>
-                    <p className="font-medium text-gray-900">{application.description}</p>
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl">
+                    <p className="text-xs text-gray-600 mb-2">Description</p>
+                    <p className="font-semibold text-gray-900">{application.description}</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Requested Documents</h2>
-              <div className="bg-gray-50 rounded-lg p-6 text-center">
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 text-sm">No additional documents have been requested</p>
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 transform hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Requested Documents</h2>
+              </div>
+              <div className="bg-gradient-to-br from-gray-50 to-green-50 rounded-xl p-8 text-center border-2 border-gray-200">
+                <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 font-medium">No additional documents have been requested</p>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Status Timeline</h2>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 border border-green-100">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Status Timeline</h2>
+              </div>
 
               {loading ? (
                 <div className="text-center py-8">
