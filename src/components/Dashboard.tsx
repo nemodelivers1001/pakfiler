@@ -8,9 +8,10 @@ import FAQ from './FAQ';
 interface DashboardProps {
   onNavigateToCalculator: () => void;
   onNavigateToGSTRegistration: () => void;
+  onNavigateToIRISProfile?: () => void;
 }
 
-export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration }: DashboardProps) {
+export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration, onNavigateToIRISProfile }: DashboardProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState([
     { label: 'Total Applications', value: 0, subtitle: 'Loading...', icon: TrendingUp, color: 'bg-gradient-to-br from-blue-500 to-blue-600', iconBg: 'bg-blue-100', iconColor: 'text-blue-600' },
@@ -227,6 +228,8 @@ export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegis
                       onNavigateToCalculator();
                     } else if (service.title === 'GST Registration') {
                       onNavigateToGSTRegistration();
+                    } else if (service.title === 'IRIS Profile Update' && onNavigateToIRISProfile) {
+                      onNavigateToIRISProfile();
                     }
                   }
                 }}
