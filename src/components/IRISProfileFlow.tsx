@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { createIRISSubmission } from '../lib/irisService';
 import { ArrowLeft } from 'lucide-react';
 import IRISStep1Purpose from './IRISStep1Purpose';
 import IRISStep2SalaryInfo from './IRISStep2SalaryInfo';
 import IRISStep3AdditionalInfo from './IRISStep3AdditionalInfo';
+import IRISStep3BusinessInfo from './IRISStep3BusinessInfo';
 import { IRISFormData } from '../types/iris';
 
 interface IRISProfileFlowProps {
@@ -11,6 +14,7 @@ interface IRISProfileFlowProps {
 }
 
 export default function IRISProfileFlow({ onBack, onComplete }: IRISProfileFlowProps) {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<IRISFormData>({
     purposeType: null,
@@ -22,6 +26,7 @@ export default function IRISProfileFlow({ onBack, onComplete }: IRISProfileFlowP
       has_vehicle: false,
       has_other_income: false,
     },
+    businessDetails: { businesses: [] },
   });
 
   const updateFormData = (data: Partial<IRISFormData>) => {
@@ -38,11 +43,24 @@ export default function IRISProfileFlow({ onBack, onComplete }: IRISProfileFlowP
     setCurrentStep(3);
   };
 
-  const handleStep3Complete = async (additionalInfo: Partial<IRISFormData['additionalInfo']>) => {
-    updateFormData({ additionalInfo });
+  const handleStep3Complete = async (data: any) => {
+    let finalFormData: IRISFormData;
 
-    const submissionId = crypto.randomUUID();
-    onComplete(submissionId, formData.amount);
+    if (formData.purposeType === 'salary') {
+      finalFormData = { ...formData, additionalInfo: data };
+    } else {
+      finalFormData = { ...formData, businessDetails: data };
+    }
+
+    try {
+      if (!user) throw new Error('User not authenticated');
+
+      const submission = await createIRISSubmission(finalFormData, user.id);
+      onComplete(submission.id!, formData.amount);
+    } catch (error) {
+      console.error('Error creating IRIS submission:', error);
+      alert('Failed to create submission. Please try again.');
+    }
   };
 
   const handleBack = () => {
@@ -109,11 +127,18 @@ export default function IRISProfileFlow({ onBack, onComplete }: IRISProfileFlowP
               amount={formData.amount}
             />
           )}
-          {currentStep === 3 && (
+          {currentStep === 3 && formData.purposeType === 'salary' && (
             <IRISStep3AdditionalInfo
               onContinue={handleStep3Complete}
               onBack={handleBack}
               initialData={formData.additionalInfo}
+            />
+          )}
+          {currentStep === 3 && formData.purposeType === 'business' && (
+            <IRISStep3BusinessInfo
+              onContinue={handleStep3Complete}
+              onBack={handleBack}
+              initialData={formData.businessDetails}
             />
           )}
         </div>

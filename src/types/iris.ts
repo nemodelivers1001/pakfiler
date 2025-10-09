@@ -39,10 +39,34 @@ export interface IRISAdditionalInfo {
   created_at?: string;
 }
 
+export interface IRISBusiness {
+  id: string;
+  name: string;
+  nature: string;
+  electricityConsumerNo: string;
+  commencementDate: string;
+  address: string;
+  bankAccounts: IRISBankAccount[];
+}
+
+export interface IRISBankAccount {
+  id: string;
+  bank: string;
+  iban: string;
+}
+
+export interface IRISBusinessDetails {
+  id?: string;
+  submission_id: string;
+  businesses: IRISBusiness[];
+  created_at?: string;
+}
+
 export interface IRISFormData {
   purposeType: 'salary' | 'business' | null;
   amount: number;
   completionTime: string;
   salaryDetails: Partial<IRISSalaryDetails>;
   additionalInfo: Partial<IRISAdditionalInfo>;
+  businessDetails: { businesses: IRISBusiness[] };
 }

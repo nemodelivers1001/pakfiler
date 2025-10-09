@@ -12,13 +12,18 @@ import FAQ from './FAQ';
 import AppHeader from './AppHeader';
 import PaymentScreen from './PaymentScreen';
 import { GSTApplication } from '../types/gst';
+import { createIRISSubmission, updateIRISPaymentStatus } from '../lib/irisService';
+import { IRISFormData } from '../types/iris';
+import { supabase } from '../lib/supabase';
 
 type View = 'dashboard' | 'calculator' | 'gst-registration' | 'iris-profile' | 'track-submissions' | 'application-details' | 'pricing' | 'profile' | 'faq' | 'payment';
 
 export default function MainApp() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedApplication, setSelectedApplication] = useState<GSTApplication | null>(null);
-  const [pendingPayment, setPendingPayment] = useState<{ submissionId: string; amount: number } | null>(null);
+  const [pendingPayment, setPendingPayment] = useState<{ type: 'gst' | 'iris'; submissionId: string; referenceNumber: string; amount: number } | null>(null);
+  const [irisFormData, setIrisFormData] = useState<IRISFormData | null>(null);
+  const { user } = useAuth();
 
   const handleViewDetails = (application: GSTApplication) => {
     setSelectedApplication(application);
@@ -52,22 +57,41 @@ export default function MainApp() {
         return (
           <IRISProfileFlow
             onBack={() => setCurrentView('dashboard')}
-            onComplete={(submissionId, amount) => {
-              setPendingPayment({ submissionId, amount });
-              setCurrentView('payment');
+            onComplete={async (submissionId, amount) => {
+              if (!user) return;
+
+              try {
+                const { data: submission } = await supabase
+                  .from('iris_submissions')
+                  .select('reference_number')
+                  .eq('id', submissionId)
+                  .maybeSingle();
+
+                if (submission) {
+                  setPendingPayment({
+                    type: 'iris',
+                    submissionId,
+                    referenceNumber: submission.reference_number,
+                    amount,
+                  });
+                  setCurrentView('payment');
+                }
+              } catch (error) {
+                console.error('Error fetching submission:', error);
+              }
             }}
           />
         );
       case 'payment':
         return pendingPayment ? (
           <PaymentScreen
-            application={{
-              id: pendingPayment.submissionId,
-              reference_number: `IRIS-${Date.now()}`,
-              business_name: 'IRIS Profile Update',
-              service_fee: pendingPayment.amount,
-            } as GSTApplication}
-            onPaymentComplete={() => {
+            serviceName={pendingPayment.type === 'iris' ? 'IRIS Profile Update' : 'GST Registration'}
+            referenceNumber={pendingPayment.referenceNumber}
+            amount={pendingPayment.amount}
+            onPaymentComplete={async () => {
+              if (pendingPayment.type === 'iris') {
+                await updateIRISPaymentStatus(pendingPayment.submissionId, 'paid');
+              }
               setPendingPayment(null);
               setCurrentView('track-submissions');
             }}

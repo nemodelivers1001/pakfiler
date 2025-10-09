@@ -1,17 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Search, RefreshCw, Eye, CreditCard, ArrowLeft, FileCheck, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { GSTApplication } from '../types/gst';
+import { IRISSubmission } from '../types/iris';
 import { getUserApplications } from '../lib/gstService';
+import { getUserIRISSubmissions } from '../lib/irisService';
 
 interface TrackSubmissionsProps {
   onViewDetails: (application: GSTApplication) => void;
   onPayNow: (application: GSTApplication) => void;
 }
 
+type CombinedSubmission = {
+  id: string;
+  reference_number: string;
+  service_type: 'GST Registration' | 'IRIS Profile Update';
+  status: string;
+  payment_status: string;
+  submitted_at?: string;
+  updated_at: string;
+  source: 'gst' | 'iris';
+  originalData: GSTApplication | IRISSubmission;
+};
+
 type StatusFilter = 'all' | 'pending_payment' | 'payment_verified' | 'completed';
 
 export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmissionsProps) {
-  const [applications, setApplications] = useState<GSTApplication[]>([]);
+  const [applications, setApplications] = useState<CombinedSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -19,8 +33,40 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
   const loadApplications = async () => {
     setLoading(true);
     try {
-      const data = await getUserApplications();
-      setApplications(data);
+      const [gstData, irisData] = await Promise.all([
+        getUserApplications(),
+        getUserIRISSubmissions(),
+      ]);
+
+      const gstSubmissions: CombinedSubmission[] = gstData.map(app => ({
+        id: app.id!,
+        reference_number: app.reference_number,
+        service_type: 'GST Registration' as const,
+        status: app.status,
+        payment_status: app.payment_status,
+        submitted_at: app.submitted_at,
+        updated_at: app.updated_at,
+        source: 'gst' as const,
+        originalData: app,
+      }));
+
+      const irisSubmissions: CombinedSubmission[] = irisData.map(sub => ({
+        id: sub.id!,
+        reference_number: sub.reference_number!,
+        service_type: 'IRIS Profile Update' as const,
+        status: sub.status,
+        payment_status: sub.payment_status,
+        submitted_at: sub.submitted_at,
+        updated_at: sub.updated_at!,
+        source: 'iris' as const,
+        originalData: sub,
+      }));
+
+      const combined = [...gstSubmissions, ...irisSubmissions].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
+
+      setApplications(combined);
     } catch (error) {
       console.error('Error loading applications:', error);
     } finally {
@@ -57,7 +103,7 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
   const filteredApplications = applications.filter((app) => {
     const matchesSearch =
       app.reference_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.business_name.toLowerCase().includes(searchTerm.toLowerCase());
+      app.service_type.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
 
@@ -205,7 +251,7 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
                     <tr key={app.id} className="hover:bg-blue-50 transition-all">
                       <td className="px-6 py-4">
                         <div>
-                          <p className="font-medium text-gray-900">GST Registration</p>
+                          <p className="font-medium text-gray-900">{app.service_type}</p>
                           <p className="text-sm text-gray-500">#{app.reference_number}</p>
                         </div>
                       </td>
@@ -219,9 +265,9 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
                           <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(app.status)}`}>
                             {getStatusLabel(app.status)}
                           </span>
-                          {app.payment_status === 'pending' && (
+                          {(app.payment_status === 'pending' || app.payment_status === 'unpaid') && app.source === 'gst' && (
                             <button
-                              onClick={() => onPayNow(app)}
+                              onClick={() => onPayNow(app.originalData as GSTApplication)}
                               className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded flex items-center gap-1 transition-colors"
                             >
                               <CreditCard className="w-3 h-3" />
@@ -237,13 +283,17 @@ export default function TrackSubmissions({ onViewDetails, onPayNow }: TrackSubmi
                         {formatDate(app.updated_at)}
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => onViewDetails(app)}
-                          className="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 flex items-center gap-1 transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                          Details
-                        </button>
+                        {app.source === 'gst' ? (
+                          <button
+                            onClick={() => onViewDetails(app.originalData as GSTApplication)}
+                            className="px-3 py-1.5 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 flex items-center gap-1 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Details
+                          </button>
+                        ) : (
+                          <span className="px-3 py-1.5 text-gray-400 text-sm">-</span>
+                        )}
                       </td>
                     </tr>
                   ))}

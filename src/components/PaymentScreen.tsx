@@ -1,16 +1,25 @@
 import { useState } from 'react';
 import { ArrowLeft, CreditCard, Smartphone, FileText, CheckCircle2, Wallet, Shield, Clock, Building2, Sparkles, Lock } from 'lucide-react';
 import { GSTApplication } from '../types/gst';
+import { IRISSubmission } from '../types/iris';
 
 interface PaymentScreenProps {
-  application: GSTApplication;
+  application?: GSTApplication;
+  irisSubmission?: IRISSubmission;
+  serviceName?: string;
+  referenceNumber?: string;
+  amount?: number;
   onPaymentComplete: () => void;
   onCancel: () => void;
 }
 
 type PaymentMethod = 'manual' | 'card' | 'easypaisa' | 'jazzcash';
 
-export default function PaymentScreen({ application, onPaymentComplete, onCancel }: PaymentScreenProps) {
+export default function PaymentScreen({ application, irisSubmission, serviceName, referenceNumber, amount, onPaymentComplete, onCancel }: PaymentScreenProps) {
+  const displayName = serviceName || (application ? 'GST Registration' : irisSubmission ? 'IRIS Profile Update' : 'Service');
+  const displayReference = referenceNumber || application?.reference_number || irisSubmission?.reference_number || 'N/A';
+  const displayAmount = amount || application?.service_fee || irisSubmission?.amount || 0;
+  const businessName = application?.business_name || 'IRIS Profile Update Service';
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -102,7 +111,7 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                     </p>
                   </div>
                 </div>
-                <p className="text-gray-600">Choose your preferred payment method to complete your GST Registration</p>
+                <p className="text-gray-600">Choose your preferred payment method to complete your {displayName}</p>
               </div>
 
               <div className="mb-8">
@@ -208,7 +217,7 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                       ) : (
                         <>
                           <CheckCircle2 className="w-6 h-6" />
-                          Pay Rs {application.service_fee.toLocaleString()}
+                          Pay Rs {displayAmount.toLocaleString()}
                         </>
                       )}
                     </button>
@@ -261,17 +270,17 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                 <div className="space-y-4">
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Service</p>
-                    <p className="font-bold text-gray-900 text-lg">GST Registration</p>
+                    <p className="font-bold text-gray-900 text-lg">{displayName}</p>
                   </div>
 
                   <div className="bg-blue-50 rounded-xl p-4">
                     <p className="text-xs text-blue-600 uppercase tracking-wide font-semibold mb-1">Reference No.</p>
-                    <p className="font-mono font-bold text-blue-900 text-sm">{application.reference_number}</p>
+                    <p className="font-mono font-bold text-blue-900 text-sm">{displayReference}</p>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Business Name</p>
-                    <p className="font-semibold text-gray-900">{application.business_name}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Details</p>
+                    <p className="font-semibold text-gray-900">{businessName}</p>
                   </div>
                 </div>
               </div>
@@ -280,7 +289,7 @@ export default function PaymentScreen({ application, onPaymentComplete, onCancel
                 <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-5 shadow-lg">
                   <p className="text-sm text-green-100 mb-2">Total Amount</p>
                   <p className="text-4xl font-bold text-white mb-1">
-                    Rs {application.service_fee.toLocaleString()}
+                    Rs {displayAmount.toLocaleString()}
                   </p>
                   <p className="text-xs text-green-100">Inclusive of all charges</p>
                 </div>
