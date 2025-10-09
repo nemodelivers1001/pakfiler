@@ -2,6 +2,7 @@ import { Calculator, FileCheck, Users, Building, ShoppingCart, Briefcase, UserPl
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { getUserApplications } from '../lib/gstService';
+import { getUserIRISSubmissions } from '../lib/irisService';
 import ServicePricing from './ServicePricing';
 import FAQ from './FAQ';
 
@@ -24,13 +25,30 @@ export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegis
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const applications = await getUserApplications();
-        const total = applications.length;
-        const pendingPayment = applications.filter(app => app.payment_status === 'pending').length;
-        const underProcess = applications.filter(app =>
+        const [gstApplications, irisSubmissions] = await Promise.all([
+          getUserApplications(),
+          getUserIRISSubmissions(),
+        ]);
+
+        const allApplications = [
+          ...gstApplications.map(app => ({
+            payment_status: app.payment_status,
+            status: app.status,
+          })),
+          ...irisSubmissions.map(sub => ({
+            payment_status: sub.payment_status,
+            status: sub.status,
+          })),
+        ];
+
+        const total = allApplications.length;
+        const pendingPayment = allApplications.filter(app =>
+          app.payment_status === 'pending' || app.payment_status === 'unpaid'
+        ).length;
+        const underProcess = allApplications.filter(app =>
           app.status === 'payment_verified' || app.status === 'processing'
         ).length;
-        const completed = applications.filter(app => app.status === 'completed').length;
+        const completed = allApplications.filter(app => app.status === 'completed').length;
 
         setStats([
           {
