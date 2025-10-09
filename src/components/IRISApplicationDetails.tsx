@@ -317,21 +317,24 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="bg-white p-3 rounded-lg">
                           <p className="text-xs text-gray-600 mb-1">Business Name</p>
-                          <p className="font-bold text-gray-900">{business.businessName}</p>
+                          <p className="font-bold text-gray-900">{business.name}</p>
                         </div>
                         <div className="bg-white p-3 rounded-lg">
-                          <p className="text-xs text-gray-600 mb-1">Type of Business</p>
-                          <p className="font-bold text-gray-900 capitalize">{business.businessType.replace('_', ' ')}</p>
+                          <p className="text-xs text-gray-600 mb-1">Nature of Business</p>
+                          <p className="font-bold text-gray-900">{business.nature}</p>
                         </div>
                         <div className="bg-white p-3 rounded-lg">
-                          <p className="text-xs text-gray-600 mb-1">Annual Turnover</p>
-                          <p className="font-bold text-emerald-700 text-lg">{formatCurrency(business.annualTurnover)}</p>
+                          <p className="text-xs text-gray-600 mb-1">Electricity Consumer No</p>
+                          <p className="font-bold text-emerald-700 text-lg font-mono">{business.electricityConsumerNo}</p>
                         </div>
                         <div className="bg-white p-3 rounded-lg">
-                          <p className="text-xs text-gray-600 mb-1">Number of Employees</p>
-                          <p className="font-bold text-gray-900 flex items-center gap-2">
-                            <Users className="w-4 h-4 text-gray-600" />
-                            {business.numberOfEmployees}
+                          <p className="text-xs text-gray-600 mb-1">Commencement Date</p>
+                          <p className="font-bold text-gray-900">
+                            {new Date(business.commencementDate).toLocaleDateString('en-US', {
+                              month: 'long',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
                           </p>
                         </div>
                       </div>
@@ -343,6 +346,31 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
                             Business Address
                           </p>
                           <p className="font-semibold text-gray-900">{business.address}</p>
+                        </div>
+                      )}
+
+                      {business.bankAccounts && business.bankAccounts.length > 0 && (
+                        <div className="mt-4 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border-2 border-blue-200">
+                          <p className="text-xs text-gray-600 mb-3 font-semibold flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            Bank Accounts ({business.bankAccounts.length})
+                          </p>
+                          <div className="space-y-2">
+                            {business.bankAccounts.map((account: any, accIndex: number) => (
+                              <div key={accIndex} className="bg-white p-3 rounded-lg">
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <p className="text-xs text-gray-500">Bank</p>
+                                    <p className="font-semibold text-gray-900 text-sm">{account.bank}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-gray-500">IBAN</p>
+                                    <p className="font-semibold text-gray-900 text-sm font-mono">{account.iban}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
