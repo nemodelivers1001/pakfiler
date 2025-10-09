@@ -84,13 +84,24 @@ export default function Profile() {
           .insert({
             id: user.id,
             full_name: user.user_metadata?.full_name || '',
+            mobile_number: user.user_metadata?.mobile_number || '',
             account_status: 'active',
           })
           .select()
           .single();
 
         if (insertError) throw insertError;
-        setProfile(newProfile);
+        if (newProfile) {
+          setProfile(newProfile);
+          setFormData({
+            full_name: newProfile.full_name || '',
+            cnic_number: newProfile.cnic_number || '',
+            date_of_birth: newProfile.date_of_birth || '',
+            occupation: newProfile.occupation || '',
+            mobile_number: newProfile.mobile_number || '',
+            address: newProfile.address || '',
+          });
+        }
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -169,10 +180,10 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-slate-50/30">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-green-50/40">
         <div className="text-center">
           <div className="relative w-16 h-16 mx-auto mb-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl animate-spin"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl animate-spin"></div>
             <div className="absolute inset-2 bg-white rounded-xl"></div>
           </div>
           <p className="text-lg font-semibold text-gray-700">Loading profile...</p>
@@ -188,22 +199,22 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-slate-50/30 py-6 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-emerald-50/30 to-green-50/40 py-6 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-600 rounded-3xl p-6 sm:p-8 mb-6 overflow-hidden shadow-2xl">
+        <div className="relative bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 rounded-3xl p-6 sm:p-8 mb-6 overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnpNNiAzNGMzLjMxIDAgNiAyLjY5IDYgNnMtMi42OSA2LTYgNi02LTIuNjktNi02IDIuNjktNiA2LTZ6TTM2IDM0YzMuMzEgMCA2IDIuNjkgNiA2cy0yLjY5IDYtNiA2LTYtMi42OS02LTYgMi42OS02IDYtNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
           <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-cyan-400/20 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-emerald-400/20 rounded-full blur-2xl"></div>
 
           <div className="relative flex flex-col sm:flex-row items-center gap-6">
             <div className="relative group">
               <div className="absolute inset-0 bg-white/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all"></div>
               <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white/90 backdrop-blur-md rounded-3xl flex items-center justify-center border-4 border-white/50 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-br from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                <span className="text-4xl sm:text-5xl font-bold bg-gradient-to-br from-emerald-600 to-green-600 bg-clip-text text-transparent">
                   {getInitials()}
                 </span>
               </div>
-              <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 border-4 border-white">
+              <button className="absolute -bottom-2 -right-2 w-10 h-10 bg-emerald-600 hover:bg-emerald-700 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 border-4 border-white">
                 <Camera className="w-5 h-5 text-white" />
               </button>
             </div>
@@ -212,7 +223,7 @@ export default function Profile() {
               <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 drop-shadow-lg">
                 {profile?.full_name || 'User Profile'}
               </h1>
-              <p className="text-blue-100 text-sm sm:text-base mb-4 font-medium drop-shadow">
+              <p className="text-emerald-100 text-sm sm:text-base mb-4 font-medium drop-shadow">
                 {user?.email}
               </p>
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
@@ -243,7 +254,7 @@ export default function Profile() {
                   setEditMode(!editMode);
                   setMessage({ type: '', text: '' });
                 }}
-                className="relative group px-6 py-3 bg-white/90 hover:bg-white text-blue-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                className="relative group px-6 py-3 bg-white/90 hover:bg-white text-emerald-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105"
               >
                 <div className="absolute inset-0 bg-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <span className="relative flex items-center gap-2">
@@ -279,7 +290,7 @@ export default function Profile() {
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Personal Information</h2>
@@ -294,7 +305,7 @@ export default function Profile() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <User className="w-4 h-4 text-blue-600" />
+                    <User className="w-4 h-4 text-emerald-600" />
                     Full Name
                   </label>
                   <input
@@ -302,14 +313,14 @@ export default function Profile() {
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                     disabled={!editMode}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
                     placeholder="Enter your full name"
                   />
                 </div>
 
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <CreditCard className="w-4 h-4 text-blue-600" />
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
                     CNIC Number
                   </label>
                   <input
@@ -317,14 +328,14 @@ export default function Profile() {
                     value={formData.cnic_number}
                     onChange={(e) => setFormData({ ...formData, cnic_number: e.target.value })}
                     disabled={!editMode}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
                     placeholder="12345-6789012-3"
                   />
                 </div>
 
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <Calendar className="w-4 h-4 text-emerald-600" />
                     Date of Birth
                   </label>
                   <input
@@ -332,13 +343,13 @@ export default function Profile() {
                     value={formData.date_of_birth}
                     onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
                     disabled={!editMode}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <Briefcase className="w-4 h-4 text-blue-600" />
+                    <Briefcase className="w-4 h-4 text-emerald-600" />
                     Occupation
                   </label>
                   <input
@@ -346,7 +357,7 @@ export default function Profile() {
                     value={formData.occupation}
                     onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
                     disabled={!editMode}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
                     placeholder="Your occupation"
                   />
                 </div>
@@ -355,7 +366,7 @@ export default function Profile() {
 
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Contact Information</h2>
@@ -364,7 +375,7 @@ export default function Profile() {
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <Mail className="w-4 h-4 text-cyan-600" />
+                    <Mail className="w-4 h-4 text-teal-600" />
                     Email Address
                   </label>
                   <input
@@ -381,7 +392,7 @@ export default function Profile() {
 
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <Phone className="w-4 h-4 text-cyan-600" />
+                    <Phone className="w-4 h-4 text-teal-600" />
                     Mobile Number
                   </label>
                   <input
@@ -389,14 +400,14 @@ export default function Profile() {
                     value={formData.mobile_number}
                     onChange={(e) => setFormData({ ...formData, mobile_number: e.target.value })}
                     disabled={!editMode}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 transition-all"
                     placeholder="03XX-XXXXXXX"
                   />
                 </div>
 
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <MapPin className="w-4 h-4 text-cyan-600" />
+                    <MapPin className="w-4 h-4 text-teal-600" />
                     Address
                   </label>
                   <textarea
@@ -404,7 +415,7 @@ export default function Profile() {
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     disabled={!editMode}
                     rows={3}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-600 resize-none transition-all"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-50 disabled:text-gray-600 resize-none transition-all"
                     placeholder="Your complete address"
                   />
                 </div>
@@ -416,7 +427,7 @@ export default function Profile() {
                 <button
                   onClick={handleSaveProfile}
                   disabled={saving}
-                  className="group relative px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                  className="group relative px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 >
                   <span className="flex items-center gap-2">
                     <Save className="w-5 h-5" />
@@ -437,9 +448,9 @@ export default function Profile() {
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border-2 border-blue-100">
+                <div className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-100">
                   <label className="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-1.5">
-                    <Clock className="w-4 h-4 text-blue-600" />
+                    <Clock className="w-4 h-4 text-emerald-600" />
                     Member Since
                   </label>
                   <p className="text-lg font-bold text-gray-900">
@@ -502,7 +513,7 @@ export default function Profile() {
                       type="password"
                       value={passwordData.newPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
                       placeholder="Enter new password"
                     />
                   </div>
@@ -515,7 +526,7 @@ export default function Profile() {
                       type="password"
                       value={passwordData.confirmPassword}
                       onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
                       placeholder="Confirm new password"
                     />
                   </div>
