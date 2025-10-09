@@ -314,64 +314,6 @@ export default function IRISStep2SalaryInfo({
             </div>
           </div>
 
-          {selectedType === 'salary' && (
-            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-5">
-              <p className="text-sm font-semibold text-emerald-900 mb-3 flex items-center gap-2">
-                <Building className="w-5 h-5" />
-                Employment Information
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Employer Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.employer_name}
-                    onChange={e => handleInputChange('employer_name', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                    placeholder="Company name where you are currently employed"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">
-                    Company name where you are currently employed
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Monthly Salary (Optional)
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.monthly_salary || ''}
-                      onChange={e =>
-                        handleInputChange('monthly_salary', parseFloat(e.target.value) || 0)
-                      }
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                      placeholder="50000"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Tax Deducted (Optional)
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.tax_deducted || ''}
-                      onChange={e =>
-                        handleInputChange('tax_deducted', parseFloat(e.target.value) || 0)
-                      }
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                      placeholder="5000"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="flex items-center justify-between pt-6 border-t border-slate-200">
