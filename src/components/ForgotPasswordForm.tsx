@@ -18,7 +18,10 @@ export default function ForgotPasswordForm({ onNavigateToSignIn }: ForgotPasswor
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${supabaseUrl}`,
+      });
 
       if (error) throw error;
 
