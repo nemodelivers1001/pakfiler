@@ -9,6 +9,7 @@ interface TrackSubmissionsProps {
   onViewDetails: (application: GSTApplication) => void;
   onViewIRISDetails: (submission: IRISSubmission) => void;
   onPayNow: (application: GSTApplication) => void;
+  onPayNowIRIS: (submission: IRISSubmission) => void;
 }
 
 type CombinedSubmission = {
@@ -25,7 +26,7 @@ type CombinedSubmission = {
 
 type StatusFilter = 'all' | 'pending_payment' | 'payment_verified' | 'completed';
 
-export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onPayNow }: TrackSubmissionsProps) {
+export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onPayNow, onPayNowIRIS }: TrackSubmissionsProps) {
   const [applications, setApplications] = useState<CombinedSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,13 +121,13 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDAwMDAiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDEzNGgydjJ6bTAgNGgydjJ6bS0yIDJoMnYyem0wLTRoMnYyem0wIDhoMnYyek0zNCA0aDJ2MnptMCA0aDJ2MnptLTIgMmgydjJ6bTAtNGgydjJ6bTAgOGgydjJ6bS0yIDJoMnYyek0zMiAyaDJ2MnptMCA0aDJ2MnptLTIgMmgydjJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40"></div>
 
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
         <button
           onClick={() => window.history.back()}
-          className="mb-6 group text-gray-700 hover:text-blue-600 flex items-center gap-2 transition-all font-semibold bg-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md"
+          className="mb-6 group text-gray-700 hover:text-green-600 flex items-center gap-2 transition-all font-semibold bg-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md"
         >
           <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
           <span>Back to Dashboard</span>
@@ -135,7 +136,7 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl transform hover:rotate-6 transition-transform animate-pulse-slow">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 via-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl transform hover:rotate-6 transition-transform animate-pulse-slow">
                 <FileCheck className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -151,7 +152,7 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
             <button
               onClick={loadApplications}
               disabled={loading}
-              className="px-6 py-3 bg-white border-2 border-blue-200 text-blue-700 font-bold rounded-xl flex items-center gap-3 hover:bg-blue-50 hover:border-blue-300 transition-all disabled:opacity-50 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              className="px-6 py-3 bg-white border-2 border-green-200 text-green-700 font-bold rounded-xl flex items-center gap-3 hover:bg-green-50 hover:border-green-300 transition-all disabled:opacity-50 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -159,9 +160,9 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
           </div>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border-2 border-blue-100 transform hover:scale-[1.01] transition-transform">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border-2 border-green-100 transform hover:scale-[1.01] transition-transform">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
               <Search className="w-5 h-5 text-white" />
             </div>
             <span className="text-gray-800 font-bold text-lg">Filters & Search</span>
@@ -169,13 +170,13 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
 
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-green-600 transition-colors" />
               <input
                 type="text"
                 placeholder="Search by reference number or service type..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all text-gray-800 font-medium placeholder-gray-400 shadow-sm hover:border-blue-300"
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-200 focus:border-green-500 transition-all text-gray-800 font-medium placeholder-gray-400 shadow-sm hover:border-green-300"
               />
             </div>
 
@@ -191,7 +192,7 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
                   onClick={() => setStatusFilter(filter.value as StatusFilter)}
                   className={`px-5 py-3 text-sm font-bold rounded-xl transition-all transform hover:scale-105 flex items-center gap-2 shadow-md ${
                     statusFilter === filter.value
-                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
                   }`}
                 >
@@ -203,8 +204,8 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
           </div>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-blue-100">
-          <div className="px-8 py-6 border-b-2 border-gray-100 bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border-2 border-green-100">
+          <div className="px-8 py-6 border-b-2 border-gray-100 bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-12 transition-transform">
                 <FileCheck className="w-7 h-7 text-white" />
@@ -214,14 +215,14 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
                   Applications ({filteredApplications.length})
                   <TrendingUp className="w-6 h-6" />
                 </h2>
-                <p className="text-sm text-blue-100">All your submissions in one place</p>
+                <p className="text-sm text-green-100">All your submissions in one place</p>
               </div>
             </div>
           </div>
 
           {loading ? (
             <div className="p-16 text-center">
-              <div className="inline-block w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="inline-block w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
               <p className="text-gray-600 font-semibold text-lg">Loading applications...</p>
             </div>
           ) : filteredApplications.length === 0 ? (
@@ -232,7 +233,7 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-slate-50 to-blue-50 border-b-2 border-blue-200">
+                <thead className="bg-gradient-to-r from-slate-50 to-green-50 border-b-2 border-green-200">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       Service Type
@@ -258,15 +259,15 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
                   {filteredApplications.map((app, index) => (
                     <tr
                       key={app.id}
-                      className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all transform hover:scale-[1.01] hover:shadow-md group"
+                      className="hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all transform hover:scale-[1.01] hover:shadow-md group"
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-3">
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md transform group-hover:rotate-6 transition-transform ${
                             app.source === 'gst'
-                              ? 'bg-gradient-to-br from-blue-500 to-cyan-500'
-                              : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                              ? 'bg-gradient-to-br from-green-500 to-emerald-500'
+                              : 'bg-gradient-to-br from-teal-500 to-cyan-500'
                           }`}>
                             {app.source === 'gst' ? (
                               <FileCheck className="w-6 h-6 text-white" />
@@ -275,24 +276,27 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
                             )}
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{app.service_type}</p>
+                            <p className="font-bold text-gray-900 group-hover:text-green-700 transition-colors">{app.service_type}</p>
                             <p className="text-xs text-gray-500 font-mono">#{app.reference_number}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
-                        <span className="px-3 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 text-blue-800 text-sm font-bold rounded-lg border-2 border-blue-200 shadow-sm">
+                        <span className="px-3 py-2 bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 text-sm font-bold rounded-lg border-2 border-green-200 shadow-sm">
                           {app.reference_number}
                         </span>
                       </td>
                       <td className="px-6 py-5">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className={`px-4 py-2 text-xs font-bold rounded-full shadow-md animate-pulse-slow ${getStatusColor(app.status)}`}>
                             {getStatusLabel(app.status)}
                           </span>
-                          {(app.payment_status === 'pending' || app.payment_status === 'unpaid') && app.source === 'gst' && (
+                          {(app.payment_status === 'pending' || app.payment_status === 'unpaid') && (
                             <button
-                              onClick={() => onPayNow(app.originalData as GSTApplication)}
+                              onClick={() => app.source === 'gst'
+                                ? onPayNow(app.originalData as GSTApplication)
+                                : onPayNowIRIS(app.originalData as IRISSubmission)
+                              }
                               className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                             >
                               <CreditCard className="w-4 h-4" />
@@ -313,7 +317,7 @@ export default function TrackSubmissions({ onViewDetails, onViewIRISDetails, onP
                             ? onViewDetails(app.originalData as GSTApplication)
                             : onViewIRISDetails(app.originalData as IRISSubmission)
                           }
-                          className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-sm font-bold rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                          className="px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm font-bold rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                         >
                           <Eye className="w-4 h-4" />
                           View Details

@@ -45,7 +45,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
     const colors: { [key: string]: string } = {
       pending: 'bg-gray-100 text-gray-800',
       pending_payment: 'bg-orange-100 text-orange-800',
-      payment_verified: 'bg-blue-100 text-blue-800',
+      payment_verified: 'bg-green-100 text-green-800',
       processing: 'bg-yellow-100 text-yellow-800',
       completed: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
@@ -73,9 +73,9 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="inline-block w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-gray-600 font-medium">Loading details...</p>
         </div>
       </div>
@@ -83,11 +83,11 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <button
           onClick={onBack}
-          className="mb-6 group text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-all font-medium"
+          className="mb-6 group text-gray-600 hover:text-green-600 flex items-center gap-2 transition-all font-medium"
         >
           <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
           <span className="group-hover:underline">Back to Applications</span>
@@ -95,10 +95,10 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-transform duration-300 border border-blue-100">
+            <div className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-[1.01] transition-transform duration-300 border border-green-100">
               <div className="flex items-start justify-between mb-8">
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-6 transition-transform">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg transform hover:rotate-6 transition-transform">
                     <TrendingUp className="w-8 h-8 text-white" />
                   </div>
                   <div>
@@ -114,8 +114,8 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 pb-8 border-b-2 border-gray-100">
-                <div className="flex items-center gap-4 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center shadow-md">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-md">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -156,28 +156,28 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
               <div className="mb-8 pb-8 border-b-2 border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-lg flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900">Personal Information</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <User className="w-5 h-5 text-blue-600" />
+                    <User className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Full Name</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                    <Mail className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Email</p>
                       <p className="font-semibold text-gray-900 truncate">{user?.email || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Phone className="w-5 h-5 text-blue-600" />
+                    <Phone className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Mobile</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.phone || 'N/A'}</p>
@@ -223,9 +223,9 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
             </div>
 
             {submission.submission_type === 'salary' && details?.salaryDetails && (
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 transform hover:scale-[1.01] transition-transform duration-300">
+              <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 transform hover:scale-[1.01] transition-transform duration-300">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
                     <BadgeDollarSign className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Salary Information</h2>
@@ -233,7 +233,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl">
                       <p className="text-xs text-gray-600 mb-2">Employer Name</p>
                       <p className="font-bold text-gray-900 text-lg">{details.salaryDetails.employer_name}</p>
                     </div>
@@ -293,7 +293,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
             )}
 
             {submission.submission_type === 'business' && details?.businessDetails && (
-              <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 transform hover:scale-[1.01] transition-transform duration-300">
+              <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 transform hover:scale-[1.01] transition-transform duration-300">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Building2 className="w-6 h-6 text-white" />
@@ -353,18 +353,18 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 border border-blue-100">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 border border-green-100">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
                   <Clock className="w-5 h-5 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Quick Info</h2>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl border-2 border-blue-200">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-xl border-2 border-green-200">
                   <p className="text-xs text-gray-600 mb-2">Current Status</p>
-                  <p className="font-bold text-blue-700 text-lg">{getStatusLabel(submission.status)}</p>
+                  <p className="font-bold text-green-700 text-lg">{getStatusLabel(submission.status)}</p>
                 </div>
 
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-200">

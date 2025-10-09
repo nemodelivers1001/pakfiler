@@ -41,6 +41,16 @@ export default function MainApp() {
     setCurrentView('gst-registration');
   };
 
+  const handlePayNowIRIS = (submission: IRISSubmission) => {
+    setPendingPayment({
+      type: 'iris',
+      submissionId: submission.id!,
+      referenceNumber: submission.reference_number!,
+      amount: submission.amount,
+    });
+    setCurrentView('payment');
+  };
+
   const renderContent = () => {
     switch (currentView) {
       case 'calculator':
@@ -110,6 +120,7 @@ export default function MainApp() {
             onViewDetails={handleViewDetails}
             onViewIRISDetails={handleViewIRISDetails}
             onPayNow={handlePayNow}
+            onPayNowIRIS={handlePayNowIRIS}
           />
         );
       case 'application-details':
