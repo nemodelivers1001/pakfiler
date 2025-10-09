@@ -6,28 +6,34 @@ import GSTRegistrationFlow from './GSTRegistrationFlow';
 import IRISProfileFlow from './IRISProfileFlow';
 import TrackSubmissions from './TrackSubmissions';
 import ApplicationDetails from './ApplicationDetails';
+import IRISApplicationDetails from './IRISApplicationDetails';
 import Profile from './Profile';
 import Pricing from './Pricing';
 import FAQ from './FAQ';
 import AppHeader from './AppHeader';
 import PaymentScreen from './PaymentScreen';
 import { GSTApplication } from '../types/gst';
-import { createIRISSubmission, updateIRISPaymentStatus } from '../lib/irisService';
-import { IRISFormData } from '../types/iris';
+import { IRISSubmission } from '../types/iris';
+import { updateIRISPaymentStatus } from '../lib/irisService';
 import { supabase } from '../lib/supabase';
 
-type View = 'dashboard' | 'calculator' | 'gst-registration' | 'iris-profile' | 'track-submissions' | 'application-details' | 'pricing' | 'profile' | 'faq' | 'payment';
+type View = 'dashboard' | 'calculator' | 'gst-registration' | 'iris-profile' | 'track-submissions' | 'application-details' | 'iris-details' | 'pricing' | 'profile' | 'faq' | 'payment';
 
 export default function MainApp() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedApplication, setSelectedApplication] = useState<GSTApplication | null>(null);
+  const [selectedIRISSubmission, setSelectedIRISSubmission] = useState<IRISSubmission | null>(null);
   const [pendingPayment, setPendingPayment] = useState<{ type: 'gst' | 'iris'; submissionId: string; referenceNumber: string; amount: number } | null>(null);
-  const [irisFormData, setIrisFormData] = useState<IRISFormData | null>(null);
   const { user } = useAuth();
 
   const handleViewDetails = (application: GSTApplication) => {
     setSelectedApplication(application);
     setCurrentView('application-details');
+  };
+
+  const handleViewIRISDetails = (submission: IRISSubmission) => {
+    setSelectedIRISSubmission(submission);
+    setCurrentView('iris-details');
   };
 
   const handlePayNow = (application: GSTApplication) => {
@@ -102,6 +108,7 @@ export default function MainApp() {
         return (
           <TrackSubmissions
             onViewDetails={handleViewDetails}
+            onViewIRISDetails={handleViewIRISDetails}
             onPayNow={handlePayNow}
           />
         );
@@ -109,6 +116,13 @@ export default function MainApp() {
         return selectedApplication ? (
           <ApplicationDetails
             application={selectedApplication}
+            onBack={() => setCurrentView('track-submissions')}
+          />
+        ) : null;
+      case 'iris-details':
+        return selectedIRISSubmission ? (
+          <IRISApplicationDetails
+            submission={selectedIRISSubmission}
             onBack={() => setCurrentView('track-submissions')}
           />
         ) : null;
