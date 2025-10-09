@@ -1,6 +1,6 @@
 interface HeaderProps {
-  currentPage: 'signin' | 'signup';
-  onNavigate: (page: 'signin' | 'signup') => void;
+  currentPage: 'signin' | 'signup' | 'forgot-password' | 'reset-password';
+  onNavigate: (page: 'signin' | 'signup' | 'forgot-password' | 'reset-password') => void;
 }
 
 export default function Header({ currentPage, onNavigate }: HeaderProps) {

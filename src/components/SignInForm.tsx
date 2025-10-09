@@ -3,9 +3,10 @@ import { supabase } from '../lib/supabase';
 
 interface SignInFormProps {
   onNavigateToSignUp: () => void;
+  onNavigateToForgotPassword: () => void;
 }
 
-export default function SignInForm({ onNavigateToSignUp }: SignInFormProps) {
+export default function SignInForm({ onNavigateToSignUp, onNavigateToForgotPassword }: SignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -117,9 +118,13 @@ export default function SignInForm({ onNavigateToSignUp }: SignInFormProps) {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
-              <a href="#" className="text-sm text-green-600 hover:text-green-700 font-medium">
+              <button
+                type="button"
+                onClick={onNavigateToForgotPassword}
+                className="text-sm text-green-600 hover:text-green-700 font-medium"
+              >
                 Forgot your password?
-              </a>
+              </button>
             </div>
             <input
               type="password"
