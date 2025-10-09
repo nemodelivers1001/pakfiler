@@ -1,11 +1,13 @@
 export interface IRISSubmission {
   id?: string;
   user_id: string;
+  reference_number?: string;
   submission_type: 'salary' | 'business';
   status: 'pending' | 'in_progress' | 'completed' | 'rejected';
   payment_status: 'unpaid' | 'paid';
   amount: number;
   completion_time: string;
+  submitted_at?: string;
   created_at?: string;
   updated_at?: string;
 }
