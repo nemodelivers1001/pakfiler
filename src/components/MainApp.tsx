@@ -7,10 +7,11 @@ import TrackSubmissions from './TrackSubmissions';
 import ApplicationDetails from './ApplicationDetails';
 import Profile from './Profile';
 import Pricing from './Pricing';
+import FAQ from './FAQ';
 import AppHeader from './AppHeader';
 import { GSTApplication } from '../types/gst';
 
-type View = 'dashboard' | 'calculator' | 'gst-registration' | 'track-submissions' | 'application-details' | 'pricing' | 'profile';
+type View = 'dashboard' | 'calculator' | 'gst-registration' | 'track-submissions' | 'application-details' | 'pricing' | 'profile' | 'faq';
 
 export default function MainApp() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
@@ -62,6 +63,8 @@ export default function MainApp() {
         return <Profile />;
       case 'pricing':
         return <Pricing />;
+      case 'faq':
+        return <FAQ />;
       case 'dashboard':
       default:
         return (
