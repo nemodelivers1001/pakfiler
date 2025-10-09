@@ -68,9 +68,14 @@ export async function createIRISSubmission(formData: IRISFormData, userId: strin
       throw new Error(salaryError.message);
     }
 
-    const additionalInfoData: Partial<IRISAdditionalInfo> = {
+    const additionalInfoData = {
       submission_id: submission.id,
-      ...formData.additionalInfo,
+      property_ownership: formData.additionalInfo.has_property || false,
+      property_details: formData.additionalInfo.property_details || '',
+      vehicle_ownership: formData.additionalInfo.has_vehicle || false,
+      vehicle_details: formData.additionalInfo.vehicle_details || '',
+      other_income: formData.additionalInfo.has_other_income || false,
+      other_income_details: formData.additionalInfo.other_income_details || '',
     };
 
     const { error: additionalError } = await supabase
@@ -83,7 +88,7 @@ export async function createIRISSubmission(formData: IRISFormData, userId: strin
   } else if (formData.purposeType === 'business') {
     const businessData = {
       submission_id: submission.id,
-      businesses: JSON.stringify(formData.businessDetails.businesses),
+      businesses: formData.businessDetails.businesses,
     };
 
     const { error: businessError } = await supabase
