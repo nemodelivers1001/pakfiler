@@ -66,6 +66,21 @@ export interface IRISFormData {
   amount: number;
   completionTime: string;
   salaryDetails: Partial<IRISSalaryDetails>;
-  additionalInfo: Partial<IRISAdditionalInfo>;
+  additionalInfo: {
+    email?: string;
+    mobile?: string;
+    present_address?: string;
+    fbr_iris_registration_id?: string;
+    fbr_iris_pin?: string;
+    fbr_iris_password?: string;
+    bank_name?: string;
+    iban?: string;
+    has_property?: boolean;
+    property_details?: string;
+    has_vehicle?: boolean;
+    vehicle_details?: string;
+    has_other_income?: boolean;
+    other_income_details?: string;
+  };
   businessDetails: { businesses: IRISBusiness[] };
 }
