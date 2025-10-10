@@ -32,11 +32,12 @@ export interface IRISSalaryDetails {
 export interface IRISAdditionalInfo {
   id?: string;
   submission_id: string;
-  has_property: boolean;
+  employer_name?: string;
+  has_property?: boolean;
   property_details?: string;
-  has_vehicle: boolean;
+  has_vehicle?: boolean;
   vehicle_details?: string;
-  has_other_income: boolean;
+  has_other_income?: boolean;
   other_income_details?: string;
   created_at?: string;
 }

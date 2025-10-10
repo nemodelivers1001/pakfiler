@@ -70,6 +70,7 @@ export async function createIRISSubmission(formData: IRISFormData, userId: strin
 
     const additionalInfoData = {
       submission_id: submission.id,
+      employer_name: formData.additionalInfo.employer_name || '',
       property_ownership: formData.additionalInfo.has_property || false,
       property_details: formData.additionalInfo.property_details || '',
       vehicle_ownership: formData.additionalInfo.has_vehicle || false,

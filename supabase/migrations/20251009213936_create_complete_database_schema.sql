@@ -65,6 +65,7 @@
   ### 7. iris_additional_info
   - `id` (uuid, primary key) - Unique identifier
   - `submission_id` (uuid) - References iris_submissions.id
+  - `employer_name` (text) - Employer name for salary submissions
   - Additional information fields (property, vehicle, other income)
   - Timestamps
 
@@ -399,6 +400,7 @@ CREATE POLICY "Users can update own salary details"
 CREATE TABLE IF NOT EXISTS iris_additional_info (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   submission_id uuid REFERENCES iris_submissions(id) ON DELETE CASCADE NOT NULL,
+  employer_name text DEFAULT '',
   property_ownership boolean DEFAULT false,
   property_details text DEFAULT '',
   vehicle_ownership boolean DEFAULT false,
