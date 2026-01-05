@@ -14,9 +14,10 @@ interface DashboardProps {
   onNavigateToIRISProfile?: () => void;
   onNavigateToNTNRegistration?: () => void;
   onNavigateToBusinessTaxFiling?: () => void;
+  onNavigateToPersonalTaxFiling?: () => void;
 }
 
-export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration, onNavigateToIRISProfile, onNavigateToNTNRegistration, onNavigateToBusinessTaxFiling }: DashboardProps) {
+export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegistration, onNavigateToIRISProfile, onNavigateToNTNRegistration, onNavigateToBusinessTaxFiling, onNavigateToPersonalTaxFiling }: DashboardProps) {
   const { user } = useAuth();
   const isMobile = useMobile();
   const [stats, setStats] = useState([
@@ -311,6 +312,7 @@ export default function Dashboard({ onNavigateToCalculator, onNavigateToGSTRegis
                     else if (service.title === 'NTN Registration' && onNavigateToNTNRegistration) onNavigateToNTNRegistration();
                     else if (service.title === 'Business Tax Return' && onNavigateToBusinessTaxFiling) onNavigateToBusinessTaxFiling();
                     else if (service.title === 'IRIS Profile Update' && onNavigateToIRISProfile) onNavigateToIRISProfile();
+                    else if (service.title === 'Personal Tax Filing' && onNavigateToPersonalTaxFiling) onNavigateToPersonalTaxFiling();
                   }
                 }}
                 className={`group relative bg-white/95 border-2 border-pak-green-50 rounded-[24px] sm:rounded-[40px] p-5 sm:p-10 transition-all flex flex-col items-center text-center shadow-[0_10px_30px_-5px_rgba(25,135,84,0.05)] hover:border-pak-green-200 ${service.available ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}

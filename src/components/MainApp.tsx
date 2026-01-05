@@ -5,6 +5,7 @@ import TaxCalculator from './TaxCalculator';
 import GSTRegistrationFlow from './GSTRegistrationFlow';
 import NTNRegistrationFlow from './NTNRegistrationFlow';
 import BusinessTaxFilingFlow from './BusinessTaxFilingFlow';
+import PersonalTaxFilingFlow from './PersonalTaxFilingFlow';
 import IRISProfileFlow from './IRISProfileFlow';
 import TrackSubmissions from './TrackSubmissions';
 import ApplicationDetails from './ApplicationDetails';
@@ -18,7 +19,7 @@ import { GSTApplication } from '../types/gst';
 import { IRISSubmission } from '../types/iris';
 import { updateIRISPaymentStatus } from '../lib/irisService';
 
-type View = 'dashboard' | 'calculator' | 'gst-registration' | 'ntn-registration' | 'business-tax-filing' | 'iris-profile' | 'track-submissions' | 'application-details' | 'iris-details' | 'pricing' | 'profile' | 'faq' | 'payment';
+type View = 'dashboard' | 'calculator' | 'gst-registration' | 'ntn-registration' | 'business-tax-filing' | 'personal-tax-filing' | 'iris-profile' | 'track-submissions' | 'application-details' | 'iris-details' | 'pricing' | 'profile' | 'faq' | 'payment';
 
 export default function MainApp() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
@@ -103,7 +104,6 @@ export default function MainApp() {
             }}
           />
         );
-      case 'business-tax-filing':
         return (
           <BusinessTaxFilingFlow
             onBack={() => navigateTo('dashboard')}
@@ -113,6 +113,13 @@ export default function MainApp() {
               // The flow ends at step 5 currently.
               navigateTo('track-submissions');
             }}
+          />
+        );
+      case 'personal-tax-filing':
+        return (
+          <PersonalTaxFilingFlow
+            onBack={() => navigateTo('dashboard')}
+            onComplete={() => navigateTo('track-submissions')}
           />
         );
       case 'iris-profile':
@@ -197,6 +204,7 @@ export default function MainApp() {
             onNavigateToIRISProfile={() => navigateTo('iris-profile')}
             onNavigateToNTNRegistration={() => navigateTo('ntn-registration')}
             onNavigateToBusinessTaxFiling={() => navigateTo('business-tax-filing')}
+            onNavigateToPersonalTaxFiling={() => navigateTo('personal-tax-filing')}
           />
         );
     }
