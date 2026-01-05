@@ -75,7 +75,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="inline-block w-16 h-16 border-4 border-pak-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <p className="text-gray-600 font-medium">Loading details...</p>
         </div>
       </div>
@@ -84,10 +84,10 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 py-8">
         <button
           onClick={onBack}
-          className="mb-6 group text-gray-600 hover:text-green-600 flex items-center gap-2 transition-all font-medium"
+          className="mb-6 group text-gray-600 hover:text-pak-green-600 flex items-center gap-2 transition-all font-medium"
         >
           <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
           <span className="group-hover:underline">Back to Applications</span>
@@ -163,21 +163,21 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <User className="w-5 h-5 text-green-600" />
+                    <User className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Full Name</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Mail className="w-5 h-5 text-green-600" />
+                    <Mail className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Email</p>
                       <p className="font-semibold text-gray-900 truncate">{user?.email || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Phone className="w-5 h-5 text-green-600" />
+                    <Phone className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Mobile</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.phone || 'N/A'}</p>
@@ -205,9 +205,8 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 mb-2">Payment Status</p>
-                      <p className={`font-bold uppercase text-lg ${
-                        submission.payment_status === 'paid' ? 'text-green-600' : 'text-orange-600'
-                      }`}>
+                      <p className={`font-bold uppercase text-lg ${submission.payment_status === 'paid' ? 'text-pak-green-600' : 'text-orange-600'
+                        }`}>
                         {submission.payment_status}
                       </p>
                     </div>
@@ -295,7 +294,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
             {submission.submission_type === 'business' && details?.businessDetails && (
               <div className="bg-white rounded-2xl shadow-xl p-8 border border-green-100 transform hover:scale-[1.01] transition-transform duration-300">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pak-green-600 to-pak-green-700 rounded-xl flex items-center justify-center shadow-lg">
                     <Building2 className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Business Information</h2>
@@ -308,7 +307,7 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
                       className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-200 hover:shadow-lg transition-all transform hover:-translate-y-1"
                     >
                       <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+                        <div className="w-10 h-10 bg-gradient-to-r from-pak-green-600 to-pak-green-700 rounded-lg flex items-center justify-center shadow-md">
                           <ShoppingBag className="w-5 h-5 text-white" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900">Business {index + 1}</h3>
@@ -397,9 +396,8 @@ export default function IRISApplicationDetails({ submission, onBack }: IRISAppli
 
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-200">
                   <p className="text-xs text-gray-600 mb-2">Payment Status</p>
-                  <p className={`font-bold text-lg capitalize ${
-                    submission.payment_status === 'paid' ? 'text-green-600' : 'text-orange-600'
-                  }`}>
+                  <p className={`font-bold text-lg capitalize ${submission.payment_status === 'paid' ? 'text-pak-green-600' : 'text-orange-600'
+                    }`}>
                     {submission.payment_status}
                   </p>
                 </div>

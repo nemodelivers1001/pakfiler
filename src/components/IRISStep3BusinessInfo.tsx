@@ -1,464 +1,263 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Building2, Plus, X, Trash2 } from 'lucide-react';
-
-interface Business {
-  id: string;
-  name: string;
-  nature: string;
-  electricityConsumerNo: string;
-  commencementDate: string;
-  address: string;
-  bankAccounts: BankAccount[];
-}
-
-interface BankAccount {
-  id: string;
-  bank: string;
-  iban: string;
-}
+import { ArrowLeft, Plus, Building2, Trash2, X, Briefcase, CreditCard, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IRISBusinessDetails } from '../types/iris';
 
 interface IRISStep3BusinessInfoProps {
-  onContinue: (data: { businesses: Business[] }) => void;
+  onContinue: (data: Partial<IRISBusinessDetails>) => void;
   onBack: () => void;
-  initialData: { businesses?: Business[] };
+  initialData: Partial<IRISBusinessDetails>;
 }
-
-const PAKISTANI_BANKS = [
-  'Advance Micro Finance Bank Limited',
-  'Al Baraka Bank (Pakistan) Limited',
-  'Allied Bank Limited',
-  'Askari Bank Limited',
-  'Bank Alfalah Limited',
-  'Bank Al-Habib Limited',
-  'Bank Islami Pakistan Limited',
-  'Burj Bank Limited',
-  'Dubai Islamic Bank Limited',
-  'Faysal Bank Limited',
-  'First Women Bank Limited',
-  'Habib Bank Limited',
-  'Habib Metropolitan Bank Limited',
-  'JS Bank Limited',
-  'MCB Bank Limited',
-  'MCB Islamic Bank Limited',
-  'Meezan Bank Limited',
-  'National Bank of Pakistan',
-  'NIB Bank Limited',
-  'Samba Bank Limited',
-  'Silk Bank Limited',
-  'Soneri Bank Limited',
-  'Standard Chartered Bank (Pakistan) Limited',
-  'Summit Bank Limited',
-  'Syndicate Bank Limited',
-  'The Bank of Punjab',
-  'The Bank of Khyber',
-  'United Bank Limited',
-];
 
 export default function IRISStep3BusinessInfo({
   onContinue,
   onBack,
   initialData,
 }: IRISStep3BusinessInfoProps) {
-  const [businesses, setBusinesses] = useState<Business[]>(
-    initialData.businesses || []
-  );
-  const [showBusinessModal, setShowBusinessModal] = useState(false);
-  const [editingBusiness, setEditingBusiness] = useState<Business | null>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [businesses, setBusinesses] = useState(initialData.businesses || []);
+  const [showModal, setShowModal] = useState(false);
+  const [currentBusiness, setCurrentBusiness] = useState({
+    businessName: '',
+    acquisitionDate: '',
+    capacity: '',
+    activity: '',
+    bankAccount: '',
+  });
 
-  const handleAddBusiness = () => {
-    setEditingBusiness({
-      id: crypto.randomUUID(),
-      name: '',
-      nature: '',
-      electricityConsumerNo: '',
-      commencementDate: '',
-      address: '',
-      bankAccounts: [],
+  // VALIDATION REMOVED: Save always allowed
+  const handleSaveBusiness = () => {
+    // If empty, just save with defaults or empty strings
+    setBusinesses([...businesses, { ...currentBusiness, id: Date.now().toString() }]);
+    setShowModal(false);
+    setCurrentBusiness({
+      businessName: '',
+      acquisitionDate: '',
+      capacity: '',
+      activity: '',
+      bankAccount: '',
     });
-    setShowBusinessModal(true);
-    setErrors({});
-  };
-
-  const handleEditBusiness = (business: Business) => {
-    setEditingBusiness(business);
-    setShowBusinessModal(true);
-    setErrors({});
   };
 
   const handleDeleteBusiness = (id: string) => {
     setBusinesses(businesses.filter(b => b.id !== id));
   };
 
-  const handleSaveBusiness = () => {
-    if (!editingBusiness) return;
-
-    const newErrors: Record<string, string> = {};
-
-    if (!editingBusiness.name) newErrors.name = 'Business name is required';
-    if (!editingBusiness.nature) newErrors.nature = 'Nature of business is required';
-    if (!editingBusiness.electricityConsumerNo) newErrors.electricityConsumerNo = 'Electricity consumer number is required';
-    if (!editingBusiness.commencementDate) newErrors.commencementDate = 'Commencement date is required';
-    if (!editingBusiness.address) newErrors.address = 'Business address is required';
-    if (editingBusiness.bankAccounts.length === 0) newErrors.bankAccounts = 'At least one bank account is required';
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      const existingIndex = businesses.findIndex(b => b.id === editingBusiness.id);
-      if (existingIndex >= 0) {
-        const updated = [...businesses];
-        updated[existingIndex] = editingBusiness;
-        setBusinesses(updated);
-      } else {
-        setBusinesses([...businesses, editingBusiness]);
-      }
-      setShowBusinessModal(false);
-      setEditingBusiness(null);
-    }
-  };
-
-  const handleAddBankAccount = () => {
-    if (!editingBusiness) return;
-    setEditingBusiness({
-      ...editingBusiness,
-      bankAccounts: [
-        ...editingBusiness.bankAccounts,
-        { id: crypto.randomUUID(), bank: '', iban: '' },
-      ],
-    });
-  };
-
-  const handleRemoveBankAccount = (id: string) => {
-    if (!editingBusiness) return;
-    setEditingBusiness({
-      ...editingBusiness,
-      bankAccounts: editingBusiness.bankAccounts.filter(acc => acc.id !== id),
-    });
-  };
-
-  const updateBankAccount = (id: string, field: 'bank' | 'iban', value: string) => {
-    if (!editingBusiness) return;
-    setEditingBusiness({
-      ...editingBusiness,
-      bankAccounts: editingBusiness.bankAccounts.map(acc =>
-        acc.id === id ? { ...acc, [field]: value } : acc
-      ),
-    });
-  };
-
-  const handleSubmit = () => {
-    if (businesses.length === 0) {
-      alert('Please add at least one business');
-      return;
-    }
+  // VALIDATION REMOVED: Submit always allowed
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     onContinue({ businesses });
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-10 border border-slate-100">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-3">Business Information</h2>
-          <p className="text-slate-600">
-            Enter your business information
+    <div className="max-w-4xl mx-auto">
+      <div className="glass-card p-10 rounded-[48px] border-white/60 shadow-xl shadow-pak-green-900/5 relative overflow-hidden bg-white/40 backdrop-blur-xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-black text-pak-green-950 mb-3 uppercase tracking-tight">
+            Business Portfolio
+          </h2>
+          <p className="text-gray-400 font-bold text-sm tracking-wide uppercase mb-6">
+            Manage your business entities and bank associations
           </p>
-          <p className="text-sm text-red-600 mt-2 font-medium">
-            At least one business is required
-          </p>
+
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-pak-green-50 hover:bg-pak-green-100 text-pak-green-700 rounded-2xl font-black text-xs uppercase tracking-[2px] transition-all duration-300 border border-pak-green-200 hover:border-pak-green-300 hover:scale-105 hover:shadow-lg hover:shadow-pak-green-900/10"
+          >
+            <Plus className="w-4 h-4" />
+            Add New Business
+          </button>
         </div>
 
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-emerald-600" />
-              Business Details
-            </h3>
-            <button
-              onClick={handleAddBusiness}
-              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Add Business
-            </button>
-          </div>
-
-          {businesses.length === 0 ? (
-            <div className="text-center py-16 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300">
-              <Building2 className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600 font-medium mb-2">No businesses added yet</p>
-              <p className="text-slate-500 text-sm mb-6">Add your business details to continue</p>
-              <button
-                onClick={handleAddBusiness}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold inline-flex items-center gap-2 transition-all"
+        <div className="space-y-4 mb-12 min-h-[200px]">
+          <AnimatePresence>
+            {businesses.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-gray-200 rounded-[32px] bg-white/30"
               >
-                <Plus className="w-5 h-5" />
-                Add Your First Business
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {businesses.map((business, index) => (
-                <div
-                  key={business.id}
-                  className="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                        <Building2 className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-xl font-bold text-slate-900 mb-1">{business.name}</h4>
-                        <p className="text-sm text-slate-600 mb-3">{business.nature}</p>
-                        <div className="grid md:grid-cols-2 gap-3 text-sm">
-                          <div>
-                            <span className="text-slate-500">Consumer No:</span>
-                            <span className="ml-2 font-semibold text-slate-900">{business.electricityConsumerNo}</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-500">Since:</span>
-                            <span className="ml-2 font-semibold text-slate-900">
-                              {new Date(business.commencementDate).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-slate-600 mt-2">{business.address}</p>
-                        <p className="text-xs text-emerald-700 mt-2 font-medium">
-                          {business.bankAccounts.length} bank account(s) added
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEditBusiness(business)}
-                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteBusiness(business.id)}
-                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                  <Briefcase className="w-8 h-8 text-gray-300" />
                 </div>
-              ))}
-            </div>
-          )}
+                <h3 className="text-lg font-black text-gray-400 uppercase tracking-widest mb-1">No Businesses Added</h3>
+                <p className="text-xs font-bold text-gray-300 uppercase tracking-wider">Click "Add New Business" to get started</p>
+              </motion.div>
+            ) : (
+              businesses.map((business, index) => (
+                <motion.div
+                  key={business.id || index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="group relative p-6 bg-white/60 hover:bg-white border border-white/60 rounded-[32px] shadow-sm hover:shadow-lg hover:shadow-pak-green-900/5 transition-all duration-500"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pak-green-50 to-white flex items-center justify-center shadow-sm text-pak-green-600 border border-pak-green-100/50">
+                        <Building2 className="w-6 h-6" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-black text-pak-green-950 uppercase tracking-tight mb-1">
+                          {business.businessName || 'Unnamed Business'}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {business.activity && (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">
+                              {business.activity}
+                            </span>
+                          )}
+                          {business.capacity && (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">
+                              {business.capacity}
+                            </span>
+                          )}
+                        </div>
+                        {business.bankAccount && (
+                          <div className="flex items-center gap-2 text-xs font-bold text-pak-green-700/70">
+                            <CreditCard className="w-3.5 h-3.5" />
+                            <span className="uppercase tracking-wide">{business.bankAccount}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteBusiness(business.id!)}
+                      className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                      title="Remove Business"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+        <div className="flex items-center justify-between pt-8 border-t border-gray-100">
           <button
             onClick={onBack}
-            className="px-6 py-3 text-slate-600 hover:text-slate-900 font-medium transition-colors flex items-center gap-2"
+            className="group flex items-center gap-3 px-6 py-4 text-[10px] font-black uppercase tracking-[2px] text-gray-400 hover:text-pak-green-900 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
-            Previous
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Previous Step
           </button>
 
           <button
             onClick={handleSubmit}
-            disabled={businesses.length === 0}
-            className="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+            className="px-10 py-5 rounded-[24px] font-black uppercase text-xs tracking-[3px] transition-all duration-500 flex items-center gap-4 bg-gradient-to-r from-pak-green-500 to-pak-green-brand hover:to-pak-green-700 text-white shadow-xl hover:scale-[1.02] active:scale-95"
           >
-            Submit & Continue to Payment
-            <ArrowRight className="w-5 h-5" />
+            Submit Application
+            <Check className="w-5 h-5 text-white" />
           </button>
         </div>
       </div>
 
-      {showBusinessModal && editingBusiness && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn">
-            <div className="sticky top-0 bg-white p-6 border-b border-slate-200 flex items-center justify-between z-10">
-              <h3 className="text-2xl font-bold text-slate-900">
-                {businesses.find(b => b.id === editingBusiness.id) ? 'Edit Business' : 'Add Business'}
-              </h3>
-              <button
-                onClick={() => setShowBusinessModal(false)}
-                className="text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {/* Modal for Adding Business */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            onClick={() => setShowModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[40px] shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                <h3 className="text-xl font-black text-pak-green-950 uppercase tracking-tight">Add Business</h3>
+                <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
 
-            <div className="p-6 space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Business Name <span className="text-red-500">*</span>
-                  </label>
+              <div className="p-8 space-y-6">
+                {/* Input Fields */}
+                <div className="relative group">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Business Name</label>
                   <input
                     type="text"
-                    value={editingBusiness.name}
-                    onChange={e => setEditingBusiness({ ...editingBusiness, name: e.target.value })}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      errors.name
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-200'
-                    }`}
-                    placeholder="Enter business name"
+                    value={currentBusiness.businessName}
+                    onChange={(e) => setCurrentBusiness({ ...currentBusiness, businessName: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-pak-green-200 focus:bg-white transition-all text-lg font-black text-pak-green-950 outline-none rounded-2xl placeholder:text-gray-500 placeholder:font-bold"
+                    placeholder="e.g. Acme Traders"
                   />
-                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Nature of Business <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={editingBusiness.nature}
-                    onChange={e => setEditingBusiness({ ...editingBusiness, nature: e.target.value })}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      errors.nature
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-200'
-                    }`}
-                    placeholder="Enter nature of business"
-                  />
-                  {errors.nature && <p className="text-red-500 text-sm mt-1">{errors.nature}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Electricity Consumer No. <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={editingBusiness.electricityConsumerNo}
-                    onChange={e => setEditingBusiness({ ...editingBusiness, electricityConsumerNo: e.target.value })}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      errors.electricityConsumerNo
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-200'
-                    }`}
-                    placeholder="Enter electricity consumer number"
-                  />
-                  {errors.electricityConsumerNo && <p className="text-red-500 text-sm mt-1">{errors.electricityConsumerNo}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Business Commencement Date <span className="text-red-500">*</span>
-                  </label>
+                <div className="relative group">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Acquisition Date</label>
                   <input
                     type="date"
-                    value={editingBusiness.commencementDate}
-                    onChange={e => setEditingBusiness({ ...editingBusiness, commencementDate: e.target.value })}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      errors.commencementDate
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-200'
-                    }`}
+                    value={currentBusiness.acquisitionDate}
+                    onChange={(e) => setCurrentBusiness({ ...currentBusiness, acquisitionDate: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-pak-green-200 focus:bg-white transition-all text-lg font-black text-pak-green-950 outline-none rounded-2xl text-gray-500 uppercase tracking-wider font-bold"
                   />
-                  {errors.commencementDate && <p className="text-red-500 text-sm mt-1">{errors.commencementDate}</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative group">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Capacity</label>
+                    <select
+                      value={currentBusiness.capacity}
+                      onChange={(e) => setCurrentBusiness({ ...currentBusiness, capacity: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-pak-green-200 focus:bg-white transition-all font-bold text-pak-green-950 outline-none rounded-2xl appearance-none"
+                    >
+                      <option value="">Select</option>
+                      <option value="Owner">Owner</option>
+                      <option value="Partner">Partner</option>
+                      <option value="Director">Director</option>
+                    </select>
+                  </div>
+                  <div className="relative group">
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Activity</label>
+                    <input
+                      type="text"
+                      value={currentBusiness.activity}
+                      onChange={(e) => setCurrentBusiness({ ...currentBusiness, activity: e.target.value })}
+                      className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-pak-green-200 focus:bg-white transition-all font-bold text-pak-green-950 outline-none rounded-2xl placeholder:text-gray-500"
+                      placeholder="e.g. Retail"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative group">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-3 ml-1">Bank Account</label>
+                  <input
+                    type="text"
+                    value={currentBusiness.bankAccount}
+                    onChange={(e) => setCurrentBusiness({ ...currentBusiness, bankAccount: e.target.value })}
+                    className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent focus:border-pak-green-200 focus:bg-white transition-all font-bold text-pak-green-950 outline-none rounded-2xl placeholder:text-gray-500"
+                    placeholder="Account Title / Number"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Business Address <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={editingBusiness.address}
-                  onChange={e => setEditingBusiness({ ...editingBusiness, address: e.target.value })}
-                  rows={3}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                    errors.address
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                      : 'border-slate-200 focus:border-emerald-500 focus:ring-emerald-200'
-                  }`}
-                  placeholder="Enter complete business address"
-                />
-                {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+              <div className="p-8 border-t border-gray-100 flex justify-end gap-4 bg-gray-50/30">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-6 py-3 rounded-xl font-bold text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveBusiness}
+                  className="px-8 py-3 bg-gradient-to-r from-pak-green-500 to-pak-green-brand hover:to-pak-green-700 text-white rounded-xl font-black uppercase text-xs tracking-widest shadow-lg transition-all hover:scale-105"
+                >
+                  Add Business
+                </button>
               </div>
-
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm font-semibold text-blue-900 flex items-center gap-2">
-                    Banking Information <span className="text-red-500">*</span>
-                  </p>
-                  <button
-                    onClick={handleAddBankAccount}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Bank Account
-                  </button>
-                </div>
-                <p className="text-xs text-blue-700 mb-4">
-                  At least one bank account is required
-                </p>
-                {errors.bankAccounts && <p className="text-red-500 text-sm mb-4">{errors.bankAccounts}</p>}
-
-                <div className="space-y-4">
-                  {editingBusiness.bankAccounts.map((account) => (
-                    <div key={account.id} className="bg-white rounded-xl p-4 border border-blue-200">
-                      <div className="grid md:grid-cols-2 gap-4 mb-3">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Bank <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={account.bank}
-                            onChange={e => updateBankAccount(account.id, 'bank', e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                          >
-                            <option value="">Select bank</option>
-                            {PAKISTANI_BANKS.map(bank => (
-                              <option key={bank} value={bank}>{bank}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
-                            IBAN <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={account.iban}
-                            onChange={e => updateBankAccount(account.id, 'iban', e.target.value.toUpperCase())}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                            placeholder="PK36ABCD0000001234567890"
-                          />
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => handleRemoveBankAccount(account.id)}
-                        className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Remove Account
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="sticky bottom-0 bg-white p-6 border-t border-slate-200 flex justify-end gap-3">
-              <button
-                onClick={() => setShowBusinessModal(false)}
-                className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveBusiness}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 transition-all"
-              >
-                Save Business
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

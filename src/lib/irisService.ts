@@ -1,4 +1,3 @@
-import { supabase } from './supabase';
 import {
   IRISSubmission,
   IRISSalaryDetails,
@@ -7,33 +6,25 @@ import {
   IRISFormData,
 } from '../types/iris';
 
+const STORAGE_KEY_IRIS = 'pakfiler_mock_iris_submissions';
+
+const getSubmissions = (): any[] => {
+  const data = localStorage.getItem(STORAGE_KEY_IRIS);
+  return data ? JSON.parse(data) : [];
+};
+
+const saveSubmissions = (subs: any[]) => {
+  localStorage.setItem(STORAGE_KEY_IRIS, JSON.stringify(subs));
+};
+
 export async function createIRISSubmission(formData: IRISFormData, userId: string) {
-  const { data: profile, error: profileError } = await supabase
-    .from('user_profiles')
-    .select('id')
-    .eq('id', userId)
-    .maybeSingle();
-
-  if (profileError) {
-    throw new Error('Failed to verify user profile: ' + profileError.message);
-  }
-
-  if (!profile) {
-    const { error: createProfileError } = await supabase
-      .from('user_profiles')
-      .insert({
-        id: userId,
-        account_status: 'active',
-      });
-
-    if (createProfileError) {
-      throw new Error('Failed to create user profile: ' + createProfileError.message);
-    }
-  }
+  await new Promise(resolve => setTimeout(resolve, 500));
 
   const referenceNumber = `IRIS-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
 
-  const submissionData: Partial<IRISSubmission> = {
+  const submissionId = crypto.randomUUID();
+  const submissionData = {
+    id: submissionId,
     user_id: userId,
     reference_number: referenceNumber,
     submission_type: formData.purposeType!,
@@ -42,34 +33,14 @@ export async function createIRISSubmission(formData: IRISFormData, userId: strin
     amount: formData.amount,
     completion_time: formData.completionTime,
     submitted_at: new Date().toISOString(),
-  };
-
-  const { data: submission, error: submissionError } = await supabase
-    .from('iris_submissions')
-    .insert(submissionData)
-    .select()
-    .maybeSingle();
-
-  if (submissionError || !submission) {
-    throw new Error(submissionError?.message || 'Failed to create submission');
-  }
-
-  if (formData.purposeType === 'salary') {
-    const salaryData: Partial<IRISSalaryDetails> = {
-      submission_id: submission.id,
-      ...formData.salaryDetails,
-    };
-
-    const { error: salaryError } = await supabase
-      .from('iris_salary_details')
-      .insert(salaryData);
-
-    if (salaryError) {
-      throw new Error(salaryError.message);
-    }
-
-    const additionalInfoData = {
-      submission_id: submission.id,
+    created_at: new Date().toISOString(),
+    // Store related data embedded for simplicity in mock
+    salaryDetails: formData.purposeType === 'salary' ? {
+      submission_id: submissionId,
+      ...formData.salaryDetails
+    } : undefined,
+    additionalInfo: formData.purposeType === 'salary' ? {
+      submission_id: submissionId,
       employer_name: formData.additionalInfo.employer_name || '',
       property_ownership: formData.additionalInfo.has_property || false,
       property_details: formData.additionalInfo.property_details || '',
@@ -77,104 +48,62 @@ export async function createIRISSubmission(formData: IRISFormData, userId: strin
       vehicle_details: formData.additionalInfo.vehicle_details || '',
       other_income: formData.additionalInfo.has_other_income || false,
       other_income_details: formData.additionalInfo.other_income_details || '',
-    };
+    } : undefined,
+    businessDetails: formData.purposeType === 'business' ? {
+      submission_id: submissionId,
+      businesses: formData.businessDetails.businesses
+    } : undefined
+  };
 
-    const { error: additionalError } = await supabase
-      .from('iris_additional_info')
-      .insert(additionalInfoData);
+  const subs = getSubmissions();
+  subs.push(submissionData);
+  saveSubmissions(subs);
 
-    if (additionalError) {
-      throw new Error(additionalError.message);
-    }
-  } else if (formData.purposeType === 'business') {
-    const businessData = {
-      submission_id: submission.id,
-      businesses: formData.businessDetails.businesses,
-    };
-
-    const { error: businessError } = await supabase
-      .from('iris_business_details')
-      .insert(businessData);
-
-    if (businessError) {
-      throw new Error(businessError.message);
-    }
-  }
-
-  return submission;
+  return submissionData;
 }
 
 export async function getUserIRISSubmissions(): Promise<IRISSubmission[]> {
-  const { data, error } = await supabase
-    .from('iris_submissions')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(error.message);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const subs = getSubmissions();
+  // Filter for current user mock if needed, but assuming single user context for simplicity often works or read from local storage
+  const sessionStr = localStorage.getItem('pakfiler_mock_session');
+  if (sessionStr) {
+    const session = JSON.parse(sessionStr);
+    return subs.filter(s => s.user_id === session.user.id);
   }
-
-  return data || [];
+  return [];
 }
 
 export async function getIRISSubmissionById(id: string) {
-  const { data: submission, error: submissionError } = await supabase
-    .from('iris_submissions')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const subs = getSubmissions();
+  const submission = subs.find(s => s.id === id);
 
-  if (submissionError || !submission) {
-    throw new Error(submissionError?.message || 'Submission not found');
+  if (!submission) {
+    throw new Error('Submission not found');
   }
 
   if (submission.submission_type === 'salary') {
-    const { data: salaryDetails } = await supabase
-      .from('iris_salary_details')
-      .select('*')
-      .eq('submission_id', id)
-      .maybeSingle();
-
-    const { data: additionalInfo } = await supabase
-      .from('iris_additional_info')
-      .select('*')
-      .eq('submission_id', id)
-      .maybeSingle();
-
     return {
       submission,
-      salaryDetails,
-      additionalInfo,
+      salaryDetails: submission.salaryDetails,
+      additionalInfo: submission.additionalInfo,
     };
   } else {
-    const { data: businessDetails } = await supabase
-      .from('iris_business_details')
-      .select('*')
-      .eq('submission_id', id)
-      .maybeSingle();
-
     return {
       submission,
-      businessDetails: businessDetails
-        ? {
-            ...businessDetails,
-            businesses: JSON.parse(businessDetails.businesses as string),
-          }
-        : null,
+      businessDetails: submission.businessDetails,
     };
   }
 }
 
 export async function updateIRISPaymentStatus(submissionId: string, status: 'paid') {
-  const { error } = await supabase
-    .from('iris_submissions')
-    .update({
-      payment_status: status,
-      status: 'payment_verified',
-    })
-    .eq('id', submissionId);
-
-  if (error) {
-    throw new Error(error.message);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const subs = getSubmissions();
+  const index = subs.findIndex(s => s.id === submissionId);
+  if (index !== -1) {
+    subs[index].payment_status = status;
+    subs[index].status = 'payment_verified';
+    saveSubmissions(subs);
   }
 }

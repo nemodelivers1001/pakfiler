@@ -78,10 +78,10 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 py-8">
         <button
           onClick={onBack}
-          className="mb-6 group text-gray-600 hover:text-green-600 flex items-center gap-2 transition-all font-medium"
+          className="mb-6 group text-gray-600 hover:text-pak-green-600 flex items-center gap-2 transition-all font-medium"
         >
           <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
           <span className="group-hover:underline">Back to Applications</span>
@@ -148,21 +148,21 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <User className="w-5 h-5 text-green-600" />
+                    <User className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Full Name</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.full_name || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Mail className="w-5 h-5 text-green-600" />
+                    <Mail className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Email</p>
                       <p className="font-semibold text-gray-900 truncate">{user?.email || 'N/A'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Phone className="w-5 h-5 text-green-600" />
+                    <Phone className="w-5 h-5 text-pak-green-600" />
                     <div>
                       <p className="text-xs text-gray-600">Mobile</p>
                       <p className="font-semibold text-gray-900">{user?.user_metadata?.phone || 'N/A'}</p>
@@ -190,9 +190,8 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
                     </div>
                     <div>
                       <p className="text-xs text-gray-600 mb-2">Payment Status</p>
-                      <p className={`font-bold uppercase text-lg ${
-                        application.payment_status === 'completed' ? 'text-green-600' : 'text-orange-600'
-                      }`}>
+                      <p className={`font-bold uppercase text-lg ${application.payment_status === 'completed' ? 'text-pak-green-600' : 'text-orange-600'
+                        }`}>
                         {application.payment_status}
                       </p>
                     </div>
@@ -358,7 +357,7 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
 
               {loading ? (
                 <div className="text-center py-8">
-                  <div className="inline-block w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="inline-block w-6 h-6 border-2 border-pak-green-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : timeline.length === 0 ? (
                 <p className="text-gray-600 text-sm text-center py-8">No timeline available</p>
@@ -367,17 +366,15 @@ export default function ApplicationDetails({ application, onBack }: ApplicationD
                   {timeline.map((entry, index) => (
                     <div key={entry.id} className="flex gap-3">
                       <div className="flex flex-col items-center">
-                        <div className={`w-3 h-3 rounded-full ${
-                          index === 0 ? 'bg-green-500' : 'bg-gray-300'
-                        }`}></div>
+                        <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-green-500' : 'bg-gray-300'
+                          }`}></div>
                         {index < timeline.length - 1 && (
                           <div className="w-0.5 h-full bg-gray-200 mt-1"></div>
                         )}
                       </div>
                       <div className="flex-1 pb-4">
-                        <p className={`font-medium ${
-                          index === 0 ? 'text-green-600' : 'text-gray-900'
-                        }`}>
+                        <p className={`font-medium ${index === 0 ? 'text-pak-green-600' : 'text-gray-900'
+                          }`}>
                           {getStatusLabel(entry.status)}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">

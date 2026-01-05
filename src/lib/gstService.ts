@@ -1,106 +1,84 @@
-import { supabase } from './supabase';
 import { GSTApplication, BusinessInformationData } from '../types/gst';
 
+const STORAGE_KEY_GST = 'pakfiler_mock_gst_applications';
+const STORAGE_KEY_DOCS = 'pakfiler_mock_gst_documents';
+
+// Helper to get all applications
+const getApplications = (): GSTApplication[] => {
+  const data = localStorage.getItem(STORAGE_KEY_GST);
+  return data ? JSON.parse(data) : [];
+};
+
+// Helper to save applications
+const saveApplications = (apps: GSTApplication[]) => {
+  localStorage.setItem(STORAGE_KEY_GST, JSON.stringify(apps));
+};
+
 export const createGSTApplication = async (data: BusinessInformationData): Promise<GSTApplication> => {
-  const { data: { user } } = await supabase.auth.getUser();
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
+  // Get current user from storage (AuthContext handles the session storage)
+  const sessionStr = localStorage.getItem('pakfiler_mock_session');
+  if (!sessionStr) throw new Error('User not authenticated');
+  const session = JSON.parse(sessionStr);
+  const user = session.user;
 
-  const { data: profile, error: profileError } = await supabase
-    .from('user_profiles')
-    .select('id')
-    .eq('id', user.id)
-    .maybeSingle();
+  const refNumber = `GST-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-  if (profileError) {
-    throw new Error('Failed to verify user profile: ' + profileError.message);
-  }
-
-  if (!profile) {
-    const { error: createProfileError } = await supabase
-      .from('user_profiles')
-      .insert({
-        id: user.id,
-        account_status: 'active',
-      });
-
-    if (createProfileError) {
-      throw new Error('Failed to create user profile: ' + createProfileError.message);
-    }
-  }
-
-  const { data: refNumber } = await supabase.rpc('generate_reference_number');
-
-  const applicationData = {
+  const newApp: GSTApplication = {
+    id: crypto.randomUUID(), // Use Web Crypto API or a simple random string
     user_id: user.id,
     reference_number: refNumber,
     ...data,
     status: 'draft',
     payment_status: 'pending',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
 
-  const { data: application, error } = await supabase
-    .from('gst_applications')
-    .insert([applicationData])
-    .select()
-    .single();
+  const apps = getApplications();
+  apps.push(newApp);
+  saveApplications(apps);
 
-  if (error) throw error;
-
-  await supabase
-    .from('application_timeline')
-    .insert([{
-      application_id: application.id,
-      status: 'draft',
-      notes: 'Application created',
-    }]);
-
-  return application;
+  return newApp;
 };
 
 export const updateGSTApplication = async (
   applicationId: string,
   data: Partial<BusinessInformationData>
 ): Promise<GSTApplication> => {
-  const { data: application, error } = await supabase
-    .from('gst_applications')
-    .update(data)
-    .eq('id', applicationId)
-    .select()
-    .single();
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-  if (error) throw error;
-  return application;
+  const apps = getApplications();
+  const index = apps.findIndex(app => app.id === applicationId);
+  if (index === -1) throw new Error('Application not found');
+
+  apps[index] = {
+    ...apps[index],
+    ...data,
+    updated_at: new Date().toISOString(),
+  };
+
+  saveApplications(apps);
+  return apps[index];
 };
 
 export const getGSTApplication = async (applicationId: string): Promise<GSTApplication | null> => {
-  const { data, error } = await supabase
-    .from('gst_applications')
-    .select('*')
-    .eq('id', applicationId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
+  await new Promise(resolve => setTimeout(resolve, 300));
+  const apps = getApplications();
+  return apps.find(app => app.id === applicationId) || null;
 };
 
 export const getUserApplications = async (): Promise<GSTApplication[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
+  const sessionStr = localStorage.getItem('pakfiler_mock_session');
+  if (!sessionStr) throw new Error('User not authenticated');
+  const session = JSON.parse(sessionStr);
 
-  const { data, error } = await supabase
-    .from('gst_applications')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  const apps = getApplications();
+  return apps.filter(app => app.user_id === session.user.id);
 };
 
 export const updateApplicationPayment = async (
@@ -112,31 +90,33 @@ export const updateApplicationPayment = async (
     status?: string;
   }
 ): Promise<void> => {
-  const { error } = await supabase
-    .from('gst_applications')
-    .update(paymentData)
-    .eq('id', applicationId);
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-  if (error) throw error;
+  const apps = getApplications();
+  const index = apps.findIndex(app => app.id === applicationId);
+  if (index === -1) throw new Error('Application not found');
 
-  await supabase
-    .from('application_timeline')
-    .insert([{
-      application_id: applicationId,
-      status: paymentData.status || 'payment_verified',
-      notes: `Payment ${paymentData.payment_status} via ${paymentData.payment_method}`,
-    }]);
+  apps[index] = {
+    ...apps[index],
+    payment_status: paymentData.payment_status,
+    status: paymentData.status || apps[index].status,
+    updated_at: new Date().toISOString(),
+  };
+
+  saveApplications(apps);
 };
 
 export const getApplicationTimeline = async (applicationId: string) => {
-  const { data, error } = await supabase
-    .from('application_timeline')
-    .select('*')
-    .eq('application_id', applicationId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  // Mock timeline
+  return [
+    {
+      id: '1',
+      application_id: applicationId,
+      status: 'draft',
+      notes: 'Application created',
+      created_at: new Date().toISOString()
+    }
+  ];
 };
 
 export const uploadDocument = async (
@@ -144,86 +124,30 @@ export const uploadDocument = async (
   documentType: string,
   file: File
 ): Promise<void> => {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${applicationId}/${documentType}-${Date.now()}.${fileExt}`;
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('gst-documents')
-    .upload(fileName, file, {
-      upsert: true,
-    });
+  // Create a fake URL for the file
+  const fakeUrl = URL.createObjectURL(file);
 
-  if (uploadError) {
-    console.error('Upload error:', uploadError);
-    throw new Error(`Failed to upload document: ${uploadError.message}`);
-  }
-
-  const filePath = uploadData?.path || fileName;
-
-  const { error: dbError } = await supabase
-    .from('application_documents')
-    .insert([{
-      application_id: applicationId,
-      document_type: documentType,
-      file_name: file.name,
-      file_url: filePath,
-      file_size: file.size,
-    }]);
-
-  if (dbError) {
-    console.error('Database error:', dbError);
-    throw new Error(`Failed to save document record: ${dbError.message}`);
-  }
+  const docs = JSON.parse(localStorage.getItem(STORAGE_KEY_DOCS) || '[]');
+  docs.push({
+    id: crypto.randomUUID(),
+    application_id: applicationId,
+    document_type: documentType,
+    file_name: file.name,
+    file_url: fakeUrl, // NOTE: This URL is only valid for the session, persistency is limited
+    created_at: new Date().toISOString()
+  });
+  localStorage.setItem(STORAGE_KEY_DOCS, JSON.stringify(docs));
 };
 
 export const getApplicationDocuments = async (applicationId: string) => {
-  const { data, error } = await supabase
-    .from('application_documents')
-    .select('*')
-    .eq('application_id', applicationId)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-
-  const documentsWithUrls = await Promise.all(
-    (data || []).map(async (doc) => {
-      const { data: signedUrlData } = await supabase.storage
-        .from('gst-documents')
-        .createSignedUrl(doc.file_url, 3600);
-
-      return {
-        ...doc,
-        file_url: signedUrlData?.signedUrl || doc.file_url,
-      };
-    })
-  );
-
-  return documentsWithUrls;
+  const docs = JSON.parse(localStorage.getItem(STORAGE_KEY_DOCS) || '[]');
+  return docs.filter((d: any) => d.application_id === applicationId);
 };
 
 export const deleteDocument = async (documentId: string): Promise<void> => {
-  const { data: doc, error: fetchError } = await supabase
-    .from('application_documents')
-    .select('file_url')
-    .eq('id', documentId)
-    .maybeSingle();
-
-  if (fetchError) throw fetchError;
-
-  if (doc?.file_url) {
-    const { error: storageError } = await supabase.storage
-      .from('gst-documents')
-      .remove([doc.file_url]);
-
-    if (storageError) {
-      console.error('Storage deletion error:', storageError);
-    }
-  }
-
-  const { error } = await supabase
-    .from('application_documents')
-    .delete()
-    .eq('id', documentId);
-
-  if (error) throw error;
+  const docs = JSON.parse(localStorage.getItem(STORAGE_KEY_DOCS) || '[]');
+  const newDocs = docs.filter((d: any) => d.id !== documentId);
+  localStorage.setItem(STORAGE_KEY_DOCS, JSON.stringify(newDocs));
 };

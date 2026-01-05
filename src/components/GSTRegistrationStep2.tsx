@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, ArrowLeft, Upload, Eye, Trash2, CheckSquare, FileText, Check, X, Download, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Upload, Eye, Trash2, CheckSquare, FileText, Check, X, Download, Image as ImageIcon, Sparkles, ShieldCheck, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DOCUMENT_TYPES } from '../types/gst';
 import { uploadDocument, getApplicationDocuments, deleteDocument } from '../lib/gstService';
+import { useMobile } from '../hooks/useMobile';
 
 interface GSTRegistrationStep2Props {
   applicationId: string;
@@ -22,8 +24,8 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
   const [documents, setDocuments] = useState<DocumentStatus>({});
   const [dontHaveFlags, setDontHaveFlags] = useState<{ [key: string]: boolean }>({});
   const [previewDocument, setPreviewDocument] = useState<{ type: string; preview: string; fileName: string } | null>(null);
-  const [loading, setLoading] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+  const isMobile = useMobile();
 
   useEffect(() => {
     loadExistingDocuments();
@@ -31,11 +33,9 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
 
   const loadExistingDocuments = async () => {
     if (!applicationId) return;
-
     try {
       const existingDocs = await getApplicationDocuments(applicationId);
       const docStatus: DocumentStatus = {};
-
       existingDocs.forEach(doc => {
         docStatus[doc.document_type] = {
           uploaded: true,
@@ -43,7 +43,6 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
           id: doc.id,
         };
       });
-
       setDocuments(docStatus);
     } catch (error) {
       console.error('Error loading documents:', error);
@@ -52,12 +51,9 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
 
   const handleFileSelect = async (documentType: string, file: File | null) => {
     if (!file || !applicationId) return;
-
     setUploadingDoc(documentType);
-
     try {
       await uploadDocument(applicationId, documentType, file);
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setDocuments(prev => ({
@@ -72,7 +68,6 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error uploading document:', error);
-      alert(`Failed to upload ${documentType}. Please try again.`);
     } finally {
       setUploadingDoc(null);
     }
@@ -85,11 +80,9 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
         await deleteDocument(doc.id);
       } catch (error) {
         console.error('Error deleting document:', error);
-        alert('Failed to delete document. Please try again.');
         return;
       }
     }
-
     setDocuments(prev => {
       const newDocs = { ...prev };
       delete newDocs[documentType];
@@ -104,257 +97,216 @@ export default function GSTRegistrationStep2({ applicationId, onNext, onBack }: 
     }
   };
 
-  const getDocumentStatus = (documentType: string): 'uploaded' | 'required' | 'not-required' => {
-    if (documents[documentType]?.uploaded) return 'uploaded';
-    if (dontHaveFlags[documentType]) return 'not-required';
-    return 'required';
+  const getStatusInfo = (documentType: string) => {
+    if (documents[documentType]?.uploaded) return { label: 'Uploaded', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+    if (dontHaveFlags[documentType]) return { label: 'Not Available', color: 'bg-gray-100 text-gray-600 border-gray-200' };
+    return { label: 'Action Required', color: 'bg-orange-100 text-orange-700 border-orange-200' };
   };
 
   const uploadedCount = Object.values(documents).filter(doc => doc.uploaded).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <button
-          onClick={onBack}
-          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center gap-2 transition-colors"
-        >
-          <ArrowRight className="w-5 h-5 rotate-180" />
-          Back
-        </button>
-
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
-                <FileText className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Document Upload</h1>
-                <p className="text-sm text-gray-500">Step 2 of 3</p>
-              </div>
-            </div>
-            <p className="text-gray-600">Upload all required documents for your GST registration</p>
-          </div>
-
-          <div className="mb-8">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-md">
-                  <Check className="w-5 h-5" />
-                </div>
-                <div className="hidden sm:block">
-                  <span className="font-semibold text-green-600 block">Business Info</span>
-                  <span className="text-xs text-green-500">Completed</span>
-                </div>
-              </div>
-              <div className="flex-1 h-1 bg-gradient-to-r from-green-500 to-blue-500 rounded-full max-w-[100px]"></div>
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white flex items-center justify-center font-bold shadow-md transform transition-transform hover:scale-105">
-                  2
-                </div>
-                <div className="hidden sm:block">
-                  <span className="font-semibold text-blue-600 block">Documents</span>
-                  <span className="text-xs text-blue-500">In Progress</span>
-                </div>
-              </div>
-              <div className="flex-1 h-1 bg-gradient-to-r from-gray-300 to-gray-200 rounded-full max-w-[100px]"></div>
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold">
-                  3
-                </div>
-                <span className="text-gray-400 text-sm hidden sm:inline">Payment</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-200 pt-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Upload Required Documents</h2>
-            <p className="text-sm text-gray-600 mb-6">
-              Please upload all the required documents for GST registration. All documents should be clear and readable.
-              If you don't have a particular document, check the "I don't have this" option.
-            </p>
-
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
-              <div className="grid grid-cols-5 bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-700">
-                <div className="px-4 py-3 col-span-2">Files</div>
-                <div className="px-4 py-3">Status</div>
-                <div className="px-4 py-3">Upload</div>
-                <div className="px-4 py-3">View</div>
-                <div className="px-4 py-3">Delete</div>
-                <div className="px-4 py-3">N/A</div>
-              </div>
-
-              <div className="divide-y divide-gray-200">
-                {DOCUMENT_TYPES.map((docType) => {
-                  const status = getDocumentStatus(docType);
-                  return (
-                    <div key={docType} className="grid grid-cols-5 items-center text-sm">
-                      <div className="px-4 py-4 col-span-2 text-gray-700">{docType}</div>
-                      <div className="px-4 py-4">
-                        <span
-                          className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-                            status === 'uploaded'
-                              ? 'bg-green-100 text-green-800'
-                              : status === 'not-required'
-                              ? 'bg-gray-100 text-gray-600'
-                              : 'bg-orange-100 text-orange-800'
-                          }`}
-                        >
-                          {status === 'uploaded' ? 'Uploaded' : status === 'not-required' ? 'N/A' : 'Required'}
-                        </span>
-                      </div>
-                      <div className="px-4 py-4">
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            className="hidden"
-                            accept="image/*,.pdf"
-                            onChange={(e) => handleFileSelect(docType, e.target.files?.[0] || null)}
-                            disabled={dontHaveFlags[docType] || uploadingDoc === docType}
-                          />
-                          {uploadingDoc === docType ? (
-                            <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Upload className={`w-5 h-5 ${dontHaveFlags[docType] ? 'text-gray-300' : 'text-green-600 hover:text-green-700'}`} />
-                          )}
-                        </label>
-                      </div>
-                      <div className="px-4 py-4">
-                        {documents[docType]?.preview ? (
-                          <button
-                            onClick={() => setPreviewDocument({
-                              type: docType,
-                              preview: documents[docType].preview!,
-                              fileName: documents[docType].file?.name || 'document'
-                            })}
-                            className="text-blue-600 hover:text-blue-700 transition-colors"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-                        ) : (
-                          <Eye className="w-5 h-5 text-gray-300" />
-                        )}
-                      </div>
-                      <div className="px-4 py-4">
-                        {documents[docType]?.uploaded ? (
-                          <button
-                            onClick={() => handleDelete(docType)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        ) : (
-                          <Trash2 className="w-5 h-5 text-gray-300" />
-                        )}
-                      </div>
-                      <div className="px-4 py-4">
-                        <label className="flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={dontHaveFlags[docType] || false}
-                            onChange={(e) => handleDontHave(docType, e.target.checked)}
-                            className="sr-only"
-                          />
-                          <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
-                            dontHaveFlags[docType] ? 'bg-gray-100 border-gray-400' : 'border-gray-300'
-                          }`}>
-                            {dontHaveFlags[docType] && <CheckSquare className="w-4 h-4 text-gray-600" />}
-                          </div>
-                          <span className="ml-2 text-xs text-gray-600">I don't have this</span>
-                        </label>
-                      </div>
+    <div className="space-y-10">
+      {/* Main Content */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+        <div className="xl:col-span-8 space-y-8">
+          <div className="glass-card rounded-[48px] border-white/60 shadow-xl shadow-pak-green-900/10 relative overflow-hidden">
+            {/* Desktop Table View */}
+            {!isMobile && (
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-10 px-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-pak-green-50 rounded-xl flex items-center justify-center text-pak-green-600">
+                      <ImageIcon className="w-5 h-5" />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-5 mb-6 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-white" />
+                    <div>
+                      <h3 className="text-xl font-black text-pak-green-950 uppercase tracking-tight">Attachment List</h3>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">Files uploaded: {uploadedCount}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-blue-900 mb-1">
-                    Total files uploaded: {uploadedCount}
-                  </p>
-                  <p className="text-sm text-blue-700">
-                    Please upload all required documents or mark them as unavailable to proceed.
-                  </p>
+
+                <div className="w-full">
+                  <div className="grid grid-cols-12 px-6 py-4 bg-gray-50/50 rounded-2xl mb-4 text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
+                    <div className="col-span-1">#</div>
+                    <div className="col-span-5">Document Title</div>
+                    <div className="col-span-2 text-center">Status</div>
+                    <div className="col-span-4 text-center">Operations</div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {DOCUMENT_TYPES.map((docType, idx) => {
+                      const status = getStatusInfo(docType);
+                      const isUploading = uploadingDoc === docType;
+                      const hasPreview = !!documents[docType]?.preview;
+                      const isUploaded = documents[docType]?.uploaded;
+
+                      return (
+                        <div key={docType} className="grid grid-cols-12 px-6 py-5 items-center hover:bg-white/50 transition-colors rounded-3xl border border-transparent hover:border-white group">
+                          <div className="col-span-1 text-[11px] font-black text-gray-300">{idx + 1}</div>
+                          <div className="col-span-5">
+                            <p className="text-sm font-black text-pak-green-950 leading-tight">{docType}</p>
+                            {dontHaveFlags[docType] && <p className="text-[9px] text-orange-400 uppercase font-black tracking-widest mt-1">Flagged as N/A</p>}
+                          </div>
+                          <div className="col-span-2 flex justify-center">
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <div className="col-span-4 flex items-center justify-center gap-3">
+                            <label className={`w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all ${isUploading ? 'bg-pak-green-50' : 'bg-white shadow-sm hover:shadow-md hover:scale-110 active:scale-95'}`}>
+                              <input type="file" className="hidden" onChange={(e) => handleFileSelect(docType, e.target.files?.[0] || null)} disabled={dontHaveFlags[docType] || isUploading} />
+                              {isUploading ? <div className="w-4 h-4 border-2 border-pak-green-600 border-t-transparent rounded-full animate-spin" /> : <Upload className={`w-4 h-4 ${dontHaveFlags[docType] ? 'text-gray-200' : 'text-pak-green-600'}`} />}
+                            </label>
+
+                            <button onClick={() => hasPreview && setPreviewDocument({ type: docType, preview: documents[docType].preview!, fileName: documents[docType].file?.name || 'document' })} disabled={!hasPreview} className={`w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center transition-all ${hasPreview ? 'text-pak-green-600 hover:shadow-md hover:scale-110' : 'text-gray-200 cursor-not-allowed'}`}>
+                              <Eye className="w-4 h-4" />
+                            </button>
+
+                            <button onClick={() => isUploaded && handleDelete(docType)} disabled={!isUploaded} className={`w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center transition-all ${isUploaded ? 'text-red-600 hover:shadow-md hover:scale-110' : 'text-gray-200 cursor-not-allowed'}`}>
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+
+                            <div className="h-6 w-[2px] bg-gray-100 mx-1"></div>
+
+                            <button onClick={() => handleDontHave(docType, !dontHaveFlags[docType])} className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${dontHaveFlags[docType] ? 'bg-orange-500 text-white' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}>
+                              N/A
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="flex justify-between pt-6 border-t border-gray-200">
-              <button
-                onClick={onBack}
-                disabled={loading}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg flex items-center gap-2 hover:bg-gray-50 transition-all hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Previous Step
-              </button>
-              <button
-                onClick={onNext}
-                disabled={loading || !!uploadingDoc}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Saving...' : 'Continue to Payment'}
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
+            {/* Mobile Card View */}
+            {isMobile && (
+              <div className="p-6 space-y-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-black text-pak-green-950 uppercase tracking-tight">Attachments</h3>
+                  <div className="bg-pak-green-50 px-3 py-1 rounded-full text-[10px] font-black text-pak-green-600 uppercase tracking-widest border border-pak-green-100">{uploadedCount} / {DOCUMENT_TYPES.length}</div>
+                </div>
+
+                <div className="space-y-4">
+                  {DOCUMENT_TYPES.map((docType) => {
+                    const status = getStatusInfo(docType);
+                    const isUploading = uploadingDoc === docType;
+                    const isUploaded = documents[docType]?.uploaded;
+
+                    return (
+                      <div key={docType} className={`p-5 rounded-3xl border-2 transition-all ${isUploaded ? 'bg-emerald-50/30 border-emerald-100' : 'bg-white/50 border-white/80'}`}>
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                          <div className="flex-1">
+                            <p className="text-xs font-black text-pak-green-900 leading-tight mb-1">{docType}</p>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-[1px] border ${status.color}`}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <button onClick={() => handleDontHave(docType, !dontHaveFlags[docType])} className={`shrink-0 p-2 rounded-xl transition-all ${dontHaveFlags[docType] ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                            <CheckSquare className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="flex-1 flex items-center justify-center gap-3 bg-white border border-gray-100 shadow-sm py-3 rounded-2xl active:scale-95 transition-all text-[10px] font-black uppercase tracking-widest text-pak-green-600">
+                            <input type="file" className="hidden" onChange={(e) => handleFileSelect(docType, e.target.files?.[0] || null)} disabled={dontHaveFlags[docType] || isUploading} />
+                            {isUploading ? <div className="w-4 h-4 border-2 border-pak-green-600 border-t-transparent rounded-full animate-spin" /> : <Upload className="w-4 h-4" />}
+                            {isUploaded ? 'Replace File' : 'Upload File'}
+                          </label>
+
+                          {isUploaded && (
+                            <button onClick={() => setPreviewDocument({ type: docType, preview: documents[docType].preview!, fileName: documents[docType].file?.name || 'document' })} className="w-12 h-12 bg-pak-green-50 rounded-2xl flex items-center justify-center text-pak-green-600 border border-pak-green-100">
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          )}
+
+                          {isUploaded && (
+                            <button onClick={() => handleDelete(docType)} className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 border border-red-100">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="xl:col-span-4 space-y-8">
+          <div className="space-y-4">
+            <button
+              onClick={onNext}
+              className="w-full group bg-gradient-to-r from-pak-green-500 to-pak-green-brand hover:to-pak-green-700 text-white py-6 rounded-[32px] font-black uppercase text-xs tracking-[4px] shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50"
+            >
+              Proceed to Payment
+              <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            <button
+              onClick={onBack}
+              className="w-full flex items-center justify-center gap-3 py-5 text-[10px] font-black uppercase tracking-[3px] text-gray-400 hover:text-pak-green-700 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Part 1
+            </button>
           </div>
         </div>
       </div>
 
-      {previewDocument && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setPreviewDocument(null)}>
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                  <ImageIcon className="w-6 h-6 text-white" />
+      {/* Preview Modal */}
+      <AnimatePresence>
+        {previewDocument && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-10"
+            onClick={() => setPreviewDocument(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[40px] max-w-5xl w-full max-h-full overflow-hidden shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-pak-green-950 p-6 flex items-center justify-between text-white">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+                    <ImageIcon className="w-6 h-6 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black uppercase tracking-tight leading-none mb-1">{previewDocument.type}</h3>
+                    <p className="text-[10px] font-black text-emerald-400/50 uppercase tracking-widest">{previewDocument.fileName}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-white font-bold text-lg">{previewDocument.type}</h3>
-                  <p className="text-blue-100 text-sm">{previewDocument.fileName}</p>
+                <div className="flex items-center gap-3">
+                  <a href={previewDocument.preview} download={previewDocument.fileName} className="p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all border border-white/10">
+                    <Download className="w-5 h-5" />
+                  </a>
+                  <button onClick={() => setPreviewDocument(null)} className="p-3 bg-white/10 rounded-2xl hover:bg-white/20 transition-all border border-white/10">
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <a
-                  href={previewDocument.preview}
-                  download={previewDocument.fileName}
-                  className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all"
-                >
-                  <Download className="w-5 h-5 text-white" />
-                </a>
-                <button
-                  onClick={() => setPreviewDocument(null)}
-                  className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all"
-                >
-                  <X className="w-5 h-5 text-white" />
-                </button>
+
+              <div className="p-6 sm:p-12 overflow-auto bg-gray-50 flex items-center justify-center min-h-[50vh]">
+                {previewDocument.preview.startsWith('data:application/pdf') ? (
+                  <iframe src={previewDocument.preview} className="w-full h-[70vh] rounded-3xl border border-gray-200 bg-white" title="Document Preview" />
+                ) : (
+                  <img src={previewDocument.preview} alt={previewDocument.type} className="max-w-full h-auto rounded-3xl shadow-xl border-8 border-white" />
+                )}
               </div>
-            </div>
-            <div className="p-6 overflow-auto max-h-[calc(90vh-80px)]">
-              {previewDocument.preview.startsWith('data:application/pdf') ? (
-                <iframe
-                  src={previewDocument.preview}
-                  className="w-full h-[70vh] border border-gray-200 rounded-lg"
-                  title="Document Preview"
-                />
-              ) : (
-                <img
-                  src={previewDocument.preview}
-                  alt={previewDocument.type}
-                  className="max-w-full h-auto rounded-lg shadow-lg mx-auto"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
